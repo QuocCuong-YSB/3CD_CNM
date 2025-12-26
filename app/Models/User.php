@@ -12,8 +12,6 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $table = 'users';
-
     /**
      * The attributes that are mass assignable.
      *
@@ -23,11 +21,6 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'phone',
-        'address',
-        'id_country',
-        'avatar',
-        'level',
     ];
 
     /**
@@ -39,13 +32,7 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
-    /**
-     * Quan hệ với Country
-     */
-    public function country()
-    {
-        return $this->belongsTo(Country::class);
-    }
+
     /**
      * The attributes that should be cast.
      *
@@ -53,16 +40,5 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'level' => 'integer',
-        'id_country' => 'integer'
     ];
-     public function isAdmin()
-    {
-        return $this->level === 0;
-    }
-
-    public function isMember()
-    {
-        return $this->level === 1;
-    }
 }
