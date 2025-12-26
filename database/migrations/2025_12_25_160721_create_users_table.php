@@ -22,7 +22,7 @@ class CreateUsersTable extends Migration
             $table->string('phone');
             $table->string('address');
 
-            $table->foreignId('country_id')->constrained('countries');
+            $table->foreignId('id_country')->constrained('countries');
 
             $table->string('avatar');
             $table->integer('level')->default(1);
