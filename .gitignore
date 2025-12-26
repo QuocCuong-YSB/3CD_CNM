@@ -4,6 +4,7 @@
 /storage/*.key
 /storage/logs
 /vendor
+/storage/app/public/avatars
 /bootstrap/cache
 
 .env
