@@ -5,6 +5,7 @@
 /storage/logs
 /vendor
 /storage/app/public/avatars
+/bootstrap/cache
 
 .env
 .env.backup
