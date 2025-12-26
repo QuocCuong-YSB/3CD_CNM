@@ -14,9 +14,9 @@ class CreateHistoriesTable extends Migration
     public function up()
     {
         Schema::create('histories', function (Blueprint $table) {
-            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('id_user')->constrained('users');
 
-            $table->foreignId('product_id')->constrained('products');
+            $table->foreignId('id_product')->constrained('products');
 
             $table->decimal('price', 15, 2);
             $table->integer('quantity');
