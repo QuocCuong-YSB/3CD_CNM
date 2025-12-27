@@ -50,6 +50,7 @@ function RegisterMember() {
             .get('/country')
             .then((res) => {
                 SetCountry(res.data);
+                console.log(res.data);
             })
             .catch((errors) => console.log(errors));
     }, []);
@@ -150,8 +151,9 @@ function RegisterMember() {
             data.append('id_country', input.country);
             data.append('level', input.level);
             input.avatar.map((value, index) => {
-                data.append('avatar', value);
+                data.append('avatar[]', value);
             });
+            console.log(data);
             auth.post('/register', data, config)
                 .then((res) => {
                     SetErr({});
@@ -318,7 +320,7 @@ function RegisterMember() {
                     {country &&
                         country.map((value, index) => {
                             return (
-                                <option key={index} value={value._id}>
+                                <option key={index} value={value.id}>
                                     {value.name}
                                 </option>
                             );

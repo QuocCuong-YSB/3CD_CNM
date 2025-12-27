@@ -56,9 +56,9 @@ function LoginMember() {
                 .then((res) => {
                     console.log(res.data.user);
                     SetErr({});
-                    localStorage.setItem('IdUser', res.data.user._id);
+                    localStorage.setItem('IdUser', res.data.user.id);
                     localStorage.setItem('token', res.data.token);
-                    localStorage.setItem('tokenReferesh', res.data.tokenReferesh);
+                    // localStorage.setItem('tokenReferesh', res.data.tokenReferesh);
                     localStorage.setItem('user', JSON.stringify(res.data.user));
 
                     window.dispatchEvent(new Event('user-updated'));
@@ -67,11 +67,20 @@ function LoginMember() {
                     navigate('/member/home');
                 })
                 .catch((error) => {
-                    if (error.response && error.response.data && error.response.data.message) {
-                        console.log(error.response.data.message);
-                        errAll.api = error.response.data.message;
-                        SetErr(errAll);
-                        toast.error(error.response.data.message);
+                    if (error.response && error.response.data) {
+                        const data = error.response.data;
+
+                        if (data.errors) {
+                            const errors = data.errors;
+                            const firstError = Object.values(errors)[0][0];
+                            SetErr({ api: firstError });
+                            toast.error(firstError);
+                        } else if (data.message) {
+                            SetErr({ api: data.message });
+                            toast.error(data.message);
+                        } else {
+                            console.error('Lỗi không xác định:', error);
+                        }
                     } else {
                         console.error('Lỗi không xác định:', error);
                     }
