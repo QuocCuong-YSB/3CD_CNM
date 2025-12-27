@@ -25,7 +25,7 @@ class CreateUsersTable extends Migration
             $table->foreignId('id_country')->constrained('countries');
 
             $table->string('avatar');
-            $table->integer('level')->default(1);
+            $table->integer('level')->default(0);
 
             $table->timestamps();
             $table->softDeletes();

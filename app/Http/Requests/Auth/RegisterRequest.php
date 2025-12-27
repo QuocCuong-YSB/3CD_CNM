@@ -21,6 +21,7 @@ class RegisterRequest extends BaseRequest
             'id_country' => 'required|exists:countries,id',
             'avatar' => 'required|array',
             'avatar.*' => 'image|mimes:jpg,jpeg,png,gif|max:1024',
+            'level'=>'required|integer'
         ];
     }
     public function messages()
@@ -47,6 +48,9 @@ class RegisterRequest extends BaseRequest
 
             'id_country.required' => 'Vui lòng chọn quốc gia',
             'id_country.exists' => 'Quốc gia không hợp lệ',
+
+            'level.required' => 'Thiếu level',
+            'level.integer' => 'level là số',
         ];
     }
 }
