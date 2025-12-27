@@ -3,13 +3,16 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\ResendCodeRequest;
 use App\Http\Requests\Auth\VerifyCodeRequest;
+use App\Http\Resources\UserResource;
 use App\Mail\SendMail;
 use App\Models\User;
 use App\Models\Verification;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
@@ -99,6 +102,31 @@ class AuthController extends Controller
         Mail::to($record->email)->send(new SendMail($record->code));
 
         return response()->json(['message' => 'Đã gửi lại mã xác thực.'], 200);
+    }
+    public function login(LoginRequest $request)
+    {
+        $userRequest = $request->validated();
+        $user = User::where('email', $userRequest['email'])->first();
+        if (!$user || !Hash::check($userRequest['password'], $user->password)) {
+            return response()->json([
+            'message' => 'Email hoặc mật khẩu không đúng',
+            ], 401);
+        }
+        if ((int)$user->level !== (int)$userRequest['level']) {
+            return response()->json([
+                'message' => 'Email hoặc mật khẩu không đúng',
+            ], 403);
+        }
+        $tokenInstance = $user->createToken('access-token'); 
+        $token = $tokenInstance->plainTextToken;
+        $tokenInstance->accessToken->expires_at = Carbon::now()->addHour();
+        $tokenInstance->accessToken->save();
+
+        return response()->json([
+            'message' => 'Login successful',
+            'user' => new UserResource($user),
+            'token' => $token,
+        ], 200);
     }
 }
 

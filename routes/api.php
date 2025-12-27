@@ -17,10 +17,14 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 Route::post('/verify', [AuthController::class, 'verifyCode']);
 Route::post('/resend', [AuthController::class, 'resendCode']);
 Route::get('/member/country', [CountryController::class, 'index']);
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware(['auth:sanctum','check.token.expiration', 'level:1'])->group(function () {
+    
+});
+Route::middleware(['auth:sanctum','check.token.expiration', 'level:0'])->group(function () {
+   
 });
