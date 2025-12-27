@@ -11,7 +11,6 @@ use App\Models\User;
 use App\Models\Verification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
-use Intervention\Image\Facades\Image;
 
 class AuthController extends Controller
 {
@@ -22,8 +21,11 @@ class AuthController extends Controller
         $dataimg=[];
         if ($request->hasFile('avatar')) {
             foreach ($request->file('avatar') as $file) {
-                $path = $file->store('avatars', 'public');
-                $dataimg[] = $path;
+                $filename = time() . '_' . $file->getClientOriginalName();
+
+                $file->move(public_path('avatars'), $filename);
+
+                $dataimg[] = 'avatars/' . $filename;
             }
         }
 
@@ -97,27 +99,6 @@ class AuthController extends Controller
         Mail::to($record->email)->send(new SendMail($record->code));
 
         return response()->json(['message' => 'Đã gửi lại mã xác thực.'], 200);
-    }
-    public function SaveImgUploads($xx){
-        $name = time().'_'.uniqid().'.'.$xx->getClientOriginalExtension();
-
-        $folder=public_path('avatars/');
-        if(!file_exists($folder)){
-            mkdir($folder, 0777, true);
-        }
-
-        $name = $xx->getClientOriginalName();
-        $name_2 = $xx->getClientOriginalName();
-        $name_3 = $xx->getClientOriginalName();
- 
-        $path = $folder.$name;
-        $path2 = $folder.$name_2;
-        $path3 = $folder.$name_3;
-
-        Image::make($xx)->save($path);
-        Image::make($xx)->save($path2);
-        Image::make($xx)->save($path3);
-
     }
 }
 

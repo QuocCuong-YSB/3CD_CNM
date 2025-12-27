@@ -6,6 +6,8 @@
 /vendor
 /storage/app/public/avatars
 /bootstrap/cache
+/public/avatars/*
+!/public/avatars/.gitkeep
 
 .env
 .env.backup
