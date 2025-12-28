@@ -46,20 +46,21 @@ function LoginTest() {
             auth.post('login', data)
                 .then((res) => {
                     SetErr({});
-                    localStorage.setItem('adminId', res.data.user._id);
+                    localStorage.setItem('adminId', res.data.user.id);
                     localStorage.setItem('adminToken', res.data.token);
-                    localStorage.setItem('adminTokenRefresh', res.data.tokenRefresh);
+                    // localStorage.setItem('adminTokenRefresh', res.data.tokenRefresh);
                     navigate('/admin/dashboard');
                     toast.success('Đăng nhập thành công');
                 })
                 .catch((error) => {
-                    if (error.response && error.response.data && error.response.data.message) {
-                        toast.error(error.response.data.message);
-                        console.log(error.response.data.message);
-                        errAll.api = error.response.data.message;
-                        SetErr(errAll);
-                    } else {
-                        console.error('Lỗi không xác định:', error);
+                    if (error.response && error.response.data) {
+                        const errors = error.response.data.errors;
+
+                        if (errors?.password) {
+                            toast.error(errors.password[0]);
+                        } else {
+                            toast.error(error.response.data.message);
+                        }
                     }
                 });
         }
