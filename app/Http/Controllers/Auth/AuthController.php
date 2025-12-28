@@ -117,6 +117,11 @@ class AuthController extends Controller
                 'message' => 'Email hoặc mật khẩu không đúng',
             ], 403);
         }
+        if (!$user->is_active) {
+            return response()->json([
+                'message' => 'Tài khoản đã bị khóa'
+            ], 403);
+        }
         $tokenInstance = $user->createToken('access-token'); 
         $token = $tokenInstance->plainTextToken;
         $tokenInstance->accessToken->expires_at = Carbon::now()->addHour();
