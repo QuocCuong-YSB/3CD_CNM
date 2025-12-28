@@ -68,21 +68,13 @@ function LoginMember() {
                 })
                 .catch((error) => {
                     if (error.response && error.response.data) {
-                        const data = error.response.data;
+                        const errors = error.response.data.errors;
 
-                        if (data.errors) {
-                            const errors = data.errors;
-                            const firstError = Object.values(errors)[0][0];
-                            SetErr({ api: firstError });
-                            toast.error(firstError);
-                        } else if (data.message) {
-                            SetErr({ api: data.message });
-                            toast.error(data.message);
+                        if (errors?.password) {
+                            toast.error(errors.password[0]);
                         } else {
-                            console.error('Lỗi không xác định:', error);
+                            toast.error(error.response.data.message);
                         }
-                    } else {
-                        console.error('Lỗi không xác định:', error);
                     }
                 });
         }
