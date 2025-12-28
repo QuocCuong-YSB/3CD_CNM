@@ -2,123 +2,51 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Cart extends Model
 {
-    use HasFactory, SoftDeletes;
 
     protected $table = 'carts';
 
     protected $fillable = [
-        'id_user',
-        'id_product',
-        'price',
+        'user_id',
+        'product_id',
         'quantity',
-        'qualty', 
-        'status',
-        'orderCode',
-        'paymentMethod',
-        'address',
-        'note',
+        'price',
     ];
 
     protected $casts = [
-        'price' => 'decimal:2',
         'quantity' => 'integer',
-        'qualty' => 'integer',
-        'status' => 'integer',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
+        'price' => 'decimal:2',
     ];
 
-    protected $attributes = [
-        'status' => 0, 
-        'paymentMethod' => 'cod', 
-    ];
-
-    public static $rules = [
-        'id_user' => 'required|exists:users,id',
-        'id_product' => 'required|exists:products,id',
-        'price' => 'nullable|numeric|min:0',
-        'quantity' => 'nullable|integer|min:1',
-        'status' => 'required|integer|in:0,1,2',
-        'paymentMethod' => 'nullable|string|in:cod,paypal',
-    ];
-
-    public function user()
+    protected static function booted()
     {
-        return $this->belongsTo(User::class, 'id_user');
+        static::saving(function ($cart) {
+            if ($cart->quantity < 1) {
+                throw new \Exception('Quantity must be at least 1');
+            }
+        });
     }
 
     public function product()
     {
-        return $this->belongsTo(Product::class, 'id_product');
+        return $this->belongsTo(Product::class);
     }
 
-    public static function createHistory(array $data)
+    public function user()
     {
-        return self::create($data);
+        return $this->belongsTo(User::class);
     }
 
-    public static function checkUser($id_user)
+    public function scopeOfUser($query, $userId)
     {
-        $error = [];
-        $user = User::find($id_user);
-
-        if (!$user) {
-            $error['user'] = 'User not found!';
-        }
-
-        return $error;
+        return $query->where('user_id', $userId);
     }
 
-    public static function getOrdersByUser($id_user)
+    public function getSubtotalAttribute()
     {
-        return self::where('id_user', $id_user)
-            ->with('product')
-            ->orderBy('created_at', 'desc')
-            ->get();
-    }
-
-    public static function getOrderById($id)
-    {
-        return self::with(['product', 'user'])->find($id);
-    }
-
-    public static function updateOrderStatus($id, $status)
-    {
-        $cart = self::find($id);
-
-        if ($cart) {
-            $cart->status = $status;
-            $cart->save();
-            $cart->load('product');
-            return $cart;
-        }
-
-        return null;
-    }
-
-    public static function generateOrderCode()
-    {
-        $timestamp = now()->timestamp;
-        $random = strtoupper(substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 6));
-        $random2 = strtoupper(substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 4));
-
-        return "ORD{$timestamp}{$random}{$random2}";
-    }
-
-    public function scopeWithStatus($query, $status)
-    {
-        return $query->where('status', $status);
-    }
-
-    public function scopeWithPaymentMethod($query, $method)
-    {
-        return $query->where('paymentMethod', $method);
+        return $this->quantity * $this->price;
     }
 }

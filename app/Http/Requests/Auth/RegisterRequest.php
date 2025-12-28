@@ -20,7 +20,7 @@ class RegisterRequest extends BaseRequest
             'phone' => ['required','regex:/^(0|\+84)[0-9]{9}$/'],'address' => 'required|string',
             'id_country' => 'required|exists:countries,id',
             'avatar' => 'required|array',
-            'avatar.*' => 'image|mimes:jpg,jpeg,png,gif|max:1024',
+            'avatar.*' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:1024',
             'level'=>'required|integer'
         ];
     }
