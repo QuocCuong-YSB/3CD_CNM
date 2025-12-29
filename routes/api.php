@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\BrandController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CountryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +23,18 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/verify', [AuthController::class, 'verifyCode']);
 Route::post('/resend', [AuthController::class, 'resendCode']);
 Route::get('/member/country', [CountryController::class, 'index']);
+Route::post('admin/brand', [BrandController::class, 'store']);
+Route::get('/admin/brand', [BrandController::class, 'index']);
+Route::put('/admin/brand/update/{id}', [BrandController::class, 'update']);
+Route::delete('/admin/brand/delete/{id}', [BrandController::class, 'destroy']);
+Route::get('/admin/brand/show/{id}', [BrandController::class, 'show']);
+Route::post('admin/category', [CategoryController::class, 'store']);
+Route::get('/admin/category', [CategoryController::class, 'index']);
+Route::put('/admin/category/update/{id}', [CategoryController::class, 'update']);
+Route::delete('/admin/category/delete/{id}', [CategoryController::class, 'destroy']);
+Route::get('/admin/category/show/{id}', [CategoryController::class, 'show']);
+
+
 
 Route::middleware(['auth:sanctum','check.token.expiration', 'level:1'])->group(function () {
     
