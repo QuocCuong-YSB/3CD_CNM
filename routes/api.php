@@ -9,6 +9,7 @@ use App\Http\Controllers\CountryController;
 use App\Http\Controllers\Member\CheckoutController;
 use App\Http\Controllers\Member\OrderController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Member\MemberController as MemberMemberController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -53,6 +54,9 @@ Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:0'])->prefix
     Route::put('/cart/{id}', [CartController::class, 'update']);
     Route::delete('/cart/{id}', [CartController::class, 'destroy']);
     Route::delete('/cart', [CartController::class, 'clear']);
+
+    Route::get('/user', [MemberMemberController::class, 'getProfile']);
+    Route::post('/user', [MemberMemberController::class, 'update']);
 });
 
 

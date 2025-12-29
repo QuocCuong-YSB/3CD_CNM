@@ -124,7 +124,7 @@ class AuthController extends Controller
         }
         $tokenInstance = $user->createToken('access-token'); 
         $token = $tokenInstance->plainTextToken;
-        $tokenInstance->accessToken->expires_at = Carbon::now()->addMinute();
+        $tokenInstance->accessToken->expires_at = Carbon::now()->addHour();
         $tokenInstance->accessToken->save();
 
         return response()->json([
