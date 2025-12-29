@@ -28,7 +28,7 @@ class User extends Authenticatable
         'address',
         'id_country',
         'avatar',
-        'level',
+        
     ];
 
     /**
@@ -39,6 +39,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'deleted_at',
+        'level',
     ];
     /**
      * Quan hệ với Country

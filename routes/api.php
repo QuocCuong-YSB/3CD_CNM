@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
@@ -37,7 +38,8 @@ Route::get('/admin/category/show/{id}', [CategoryController::class, 'show']);
 
 
 Route::middleware(['auth:sanctum','check.token.expiration', 'level:1'])->group(function () {
-    
+    Route::get('/admin/member', [MemberController::class, 'index']);
+    Route::patch('/admin/member/{id}', [MemberController::class, 'updateStatus']);
 });
 Route::middleware(['auth:sanctum','check.token.expiration', 'level:0'])->group(function () {
    
