@@ -5,19 +5,11 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CountryController;
+use App\Http\Controllers\Member\CheckoutController;
+use App\Http\Controllers\Member\OrderController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -37,10 +29,20 @@ Route::get('/admin/category/show/{id}', [CategoryController::class, 'show']);
 
 
 
-Route::middleware(['auth:sanctum','check.token.expiration', 'level:1'])->group(function () {
+Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:1'])->group(function () {
     Route::get('/admin/member', [MemberController::class, 'index']);
     Route::patch('/admin/member/{id}', [MemberController::class, 'updateStatus']);
+
+    // Admin Orders
+    Route::get('/admin/orders', [AdminOrderController::class, 'index']);
+    Route::put('/admin/order/{id}/status', [AdminOrderController::class, 'updateStatus']);
 });
-Route::middleware(['auth:sanctum','check.token.expiration', 'level:0'])->group(function () {
-   
+Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:0'])->group(function () {
+    // Checkout
+    Route::post('/order', [CheckoutController::class, 'placeOrder']);
+
+    // Member Orders
+    Route::get('/order/user/{id}', [OrderController::class, 'index']);
+    Route::put('/order/{id}/cancel', [OrderController::class, 'cancel']);
+    Route::put('/order/{id}/delivered', [OrderController::class, 'markAsDelivered']);
 });
