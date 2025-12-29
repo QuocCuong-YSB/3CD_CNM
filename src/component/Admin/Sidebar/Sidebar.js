@@ -2,7 +2,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import styles from './Sidebar.module.scss';
 import classNames from 'classnames/bind';
 import { FaGlobeAsia, FaSignOutAlt, FaRegListAlt, FaShippingFast } from 'react-icons/fa';
-import { FaMoneyBillTrendUp } from 'react-icons/fa6';
+import { FaUsers } from 'react-icons/fa';
 import { TbCategoryFilled } from 'react-icons/tb';
 import { toast } from 'react-toastify';
 
@@ -21,11 +21,11 @@ const Sidebar = () => {
             <ul className={cx('sidebar-menu')}>
                 <li className={cx('sidebar-menu-item')}>
                     <NavLink
-                        to="/admin/dashboard"
+                        to="/admin/member"
                         className={({ isActive }) => cx('sidebar-menu-link', { active: isActive })}
                     >
-                        <FaMoneyBillTrendUp className={cx('icon')} />
-                        <span>Dashboard</span>
+                        <FaUsers className={cx('icon')} />
+                        <span>Quản lý người dùng</span>
                     </NavLink>
                 </li>
                 <li className={cx('sidebar-menu-item')}>
