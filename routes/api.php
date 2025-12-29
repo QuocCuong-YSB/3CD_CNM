@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\Member\CheckoutController;
@@ -16,6 +17,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/verify', [AuthController::class, 'verifyCode']);
 Route::post('/resend', [AuthController::class, 'resendCode']);
 Route::get('/member/country', [CountryController::class, 'index']);
+
 Route::post('admin/brand', [BrandController::class, 'store']);
 Route::get('/admin/brand', [BrandController::class, 'index']);
 Route::put('/admin/brand/update/{id}', [BrandController::class, 'update']);
@@ -26,8 +28,6 @@ Route::get('/admin/category', [CategoryController::class, 'index']);
 Route::put('/admin/category/update/{id}', [CategoryController::class, 'update']);
 Route::delete('/admin/category/delete/{id}', [CategoryController::class, 'destroy']);
 Route::get('/admin/category/show/{id}', [CategoryController::class, 'show']);
-
-
 
 Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:1'])->prefix('admin')->group(function () {
     Route::get('/member', [MemberController::class, 'index']);
@@ -46,4 +46,13 @@ Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:0'])->prefix
     Route::get('/order/user/{id}', [OrderController::class, 'index']);
     Route::put('/order/{id}/cancel', [OrderController::class, 'cancel']);
     Route::put('/order/{id}/delivered', [OrderController::class, 'markAsDelivered']);
+
+    // Member Carts
+    Route::get('/cart', [CartController::class, 'index']);
+    Route::post('/cart', [CartController::class, 'store']);
+    Route::put('/cart/{id}', [CartController::class, 'update']);
+    Route::delete('/cart/{id}', [CartController::class, 'destroy']);
+    Route::delete('/cart', [CartController::class, 'clear']);
 });
+
+
