@@ -28,7 +28,7 @@ class User extends Authenticatable
         'address',
         'id_country',
         'avatar',
-        'level',
+
     ];
 
     /**
@@ -39,6 +39,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'deleted_at',
+        'level',
     ];
     /**
      * Quan hệ với Country
@@ -57,9 +59,14 @@ class User extends Authenticatable
         'level' => 'integer',
         'id_country' => 'integer'
     ];
-     public function isAdmin()
+    public function isAdmin()
     {
         return $this->level === 0;
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
     }
 
     public function isMember()
