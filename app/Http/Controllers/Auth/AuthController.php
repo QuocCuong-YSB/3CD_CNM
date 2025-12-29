@@ -109,7 +109,7 @@ class AuthController extends Controller
         $user = User::where('email', $userRequest['email'])->first();
         if (!$user || !Hash::check($userRequest['password'], $user->password)) {
             return response()->json([
-            'message' => 'Email hoặc mật khẩu không đúng',
+                'message' => 'Email hoặc mật khẩu không đúng',
             ], 401);
         }
         if ((int)$user->level !== (int)$userRequest['level']) {
