@@ -29,15 +29,16 @@ Route::get('/admin/category/show/{id}', [CategoryController::class, 'show']);
 
 
 
-Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:1'])->group(function () {
-    Route::get('/admin/member', [MemberController::class, 'index']);
-    Route::patch('/admin/member/{id}', [MemberController::class, 'updateStatus']);
+Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:1'])->prefix('admin')->group(function () {
+    Route::get('/member', [MemberController::class, 'index']);
+    Route::patch('/member/{id}', [MemberController::class, 'updateStatus']);
 
     // Admin Orders
-    Route::get('/admin/orders', [AdminOrderController::class, 'index']);
-    Route::put('/admin/order/{id}/status', [AdminOrderController::class, 'updateStatus']);
+    Route::get('/orders', [AdminOrderController::class, 'index']);
+    Route::put('/order/{id}/status', [AdminOrderController::class, 'updateStatus']);
 });
-Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:0'])->group(function () {
+
+Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:0'])->prefix('member')->group(function () {
     // Checkout
     Route::post('/order', [CheckoutController::class, 'placeOrder']);
 
