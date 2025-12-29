@@ -12,21 +12,22 @@ function UpdateMember() {
         phone: '',
         address: '',
         country: '',
+        avatar_render: [],
         avatar: [],
     });
-    let iduser = localStorage.getItem('IdUser');
-    let token = localStorage.getItem('token');
+    let [country, SetCountry] = useState([]);
+    let [err, SetErr] = useState({});
     let config = {
         headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/x-www-form-urlencoded',
             Accept: 'application/json',
         },
     };
-    let [country, SetCountry] = useState([]);
+    function handleChangInputFile(e) {
+        let files = Array.from(e.target.files);
+        let name = e.target.name;
+        SetInput((states) => ({ ...states, [name]: files }));
+    }
 
-    let [FileNew, SetFileNew] = useState([]);
-    let [err, SetErr] = useState({});
     useEffect(() => {
         apiMember
             .get('/country')
@@ -37,16 +38,17 @@ function UpdateMember() {
         getDataUser();
     }, []);
     function getDataUser() {
-        apiMember.get('/user/' + iduser, config).then((res) => {
-            console.log(res.data);
+        apiMember.get('/user').then((res) => {
+            let user = res.data.data;
             SetInput({
-                email: res.data.email,
-                name: res.data.name,
+                email: user.email,
+                name: user.name,
                 pass: '',
-                phone: res.data.phone,
-                address: res.data.address,
-                country: res.data.id_country,
-                avatar: JSON.parse(res.data.avatar),
+                phone: user.phone,
+                address: user.address,
+                country: user.id_country,
+                avatar: JSON.parse(user.avatar),
+                avatar_render: JSON.parse(user.avatar),
             });
         });
     }
@@ -55,16 +57,11 @@ function UpdateMember() {
         const value = e.target.value;
         SetInput((states) => ({ ...states, [name]: value }));
     }
-    function changInputFile(e) {
-        const value = Array.from(e.target.files);
-        SetFileNew(value);
-    }
-
     function renderImage() {
-        return input.avatar.map((value, index) => {
+        return input.avatar_render.map((value, index) => {
             return (
                 <div key={index} className="avatar_list">
-                    <img src={`http://localhost:3001/${value}`}></img>
+                    <img src={`http://localhost:8000/${value}`}></img>
                 </div>
             );
         });
@@ -79,10 +76,6 @@ function UpdateMember() {
             errAll.name = 'Vui lòng nhập name';
             check = false;
         }
-        if (input.pass == '') {
-            errAll.pass = 'Vui lòng nhập password';
-            check = false;
-        }
         if (input.phone == '') {
             errAll.phone = 'Vui lòng nhập phone';
             check = false;
@@ -92,6 +85,10 @@ function UpdateMember() {
                 check = false;
             }
         }
+        if (input.pass == '') {
+            errAll.pass = 'Vui lòng nhập password';
+            check = false;
+        }
         if (input.address == '') {
             errAll.address = 'Vui lòng nhập address';
             check = false;
@@ -100,21 +97,25 @@ function UpdateMember() {
             errAll.country = 'Vui lòng chọn country';
             check = false;
         }
-        if (FileNew.length <= 0) {
-            errAll.file = 'Vui lòng chọn file';
+        if (input.avatar.length <= 0) {
+            errAll.file = 'Vui lòng chọn files';
             check = false;
         }
-        if (FileNew.length > 3) {
-            errAll.file = 'Upload tối đa 3 file';
+
+        if (input.avatar.length > 3) {
+            errAll.file = 'Chỉ chọn được tối đa 3 files';
             check = false;
         } else {
-            FileNew.map((value, index) => {
+            input.avatar.map((value, index) => {
+                console.log('File type:', value.type);
+
                 if (value.size > 1024 * 1024) {
-                    errAll.file = 'Chọn file có size < 1mb';
+                    errAll.file = 'Vui lòng chọn ảnh nhỏ hơn 1mb';
                     check = false;
                 }
+
                 if (!allowedTypes.includes(value.type)) {
-                    errAll.file = 'Chọn đúng định dạng file';
+                    errAll.file = 'Vui lòng chọn đúng định dạng files';
                     check = false;
                 }
             });
@@ -128,11 +129,11 @@ function UpdateMember() {
             data.append('phone', input.phone);
             data.append('address', input.address);
             data.append('id_country', input.country);
-            FileNew.map((value, index) => {
-                data.append('avatar', value);
+            input.avatar.map((value, index) => {
+                data.append('avatar[]', value);
             });
             apiMember
-                .put('/user/' + iduser, data, config)
+                .post('/user', data, config)
                 .then((res) => {
                     SetErr({});
                     console.log(res);
@@ -151,60 +152,36 @@ function UpdateMember() {
 
                     getDataUser();
                 })
-                .catch(async (error) => {
-                    if (error.response) {
-                        const status = error.response.status;
+                .catch((error) => {
+                    if (error.response && error.response.data) {
                         const message =
                             error.response.data?.error ||
+                            error.response.data?.errors ||
                             error.response.data?.message ||
-                            error.response.data?.error.id_country ||
                             error.message;
-                        if (status == 401) {
-                            try {
-                                const newtoken = await refershToken();
-                                if (!newtoken) {
-                                    return toast.error('Không thể làm mới token. Vui lòng đăng nhập lại.');
-                                }
-                                let config = {
-                                    headers: {
-                                        Authorization: `Bearer ${newtoken}`,
-                                        'Content-Type': 'application/x-www-form-urlencoded',
-                                        Accept: 'application/json',
-                                    },
-                                };
-                                const res2 = await apiMember.put('/user/' + iduser, data, config);
-                                toast.success(res2.data.message + ' (sau khi refresh token)');
-                                SetErr({});
-                                console.log(res2);
-                                getDataUser();
-                            } catch (refreshError) {
-                                toast.error('Lỗi khi làm mới token. Vui lòng đăng nhập lại.');
-                                console.error(refreshError);
+                        console.log(error);
+
+                        if (typeof message === 'object' && message !== null) {
+                            const keys = Object.keys(message);
+                            if (keys.length > 0) {
+                                const firstKey = keys[0];
+                                toast.error('Lỗi khi cập nhập : ' + message[firstKey]);
                             }
-                        } else if (status === 403) {
-                            toast.error(
-                                'Bạn đang đăng nhập với quyền Admin. Vui lòng đăng nhập lại với tài khoản Member để cập nhật thông tin.',
-                            );
                         } else {
-                            if (typeof message === 'object' && message !== null) {
-                                const keys = Object.keys(message);
-                                if (keys.length > 0) {
-                                    const firstKey = keys[0];
-                                    toast.error('Lỗi khi thêm: ' + message[firstKey]);
-                                }
-                            } else {
-                                toast.error('Lỗi khi thêm: ' + message);
-                            }
+                            toast.error('Lỗi khi cập nhập : ' + message);
                         }
                     } else {
-                        toast.error('Không thể kết nối đến server: ' + error.message);
+                        console.error('Lỗi không xác định:', error);
+                        toast.error('Lỗi không xác định');
                     }
                 });
         }
     }
     return (
         <div>
-            <Breadcrumb items={[{ label: 'Tài Khoản', path: '/member/account/update' }, { label: 'Cập nhật thông tin' }]} />
+            <Breadcrumb
+                items={[{ label: 'Tài Khoản', path: '/member/account/update' }, { label: 'Cập nhật thông tin' }]}
+            />
             <div className="register">
                 <h3>Cập Nhật Thông Tin</h3>
                 <form encType="multipart/form-data">
@@ -258,7 +235,7 @@ function UpdateMember() {
                         {country &&
                             country.map((value, index) => {
                                 return (
-                                    <option key={index} value={value._id}>
+                                    <option key={index} value={value.id}>
                                         {value.name}
                                     </option>
                                 );
@@ -272,7 +249,7 @@ function UpdateMember() {
                         type="file"
                         placeholder="Nhập avatar"
                         multiple
-                        onChange={changInputFile}
+                        onChange={(e) => handleChangInputFile(e)}
                     ></input>
                     <p>{err.file}</p>
                     <div className="avatar">{renderImage()}</div>
