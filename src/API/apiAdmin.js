@@ -17,10 +17,18 @@ apiAdmin.interceptors.response.use(
     (res) => res,
     (err) => {
         if (err.response?.status === 401) {
-            localStorage.removeItem('adminToken');
-            localStorage.removeItem('adminTokenRefresh');
+            localStorage.clear();
             toast.error('Bạn chưa đăng nhập');
-            window.location.href = '/admin/login';
+            setTimeout(() => {
+                window.location.href = '/admin/login';
+            }, 1500);
+        }
+        if (err.response?.status === 403) {
+            localStorage.clear();
+            toast.error('Bạn không có quyền truy cập');
+            setTimeout(() => {
+                window.location.href = '/admin/login';
+            }, 1500);
         }
 
         return Promise.reject(err);
