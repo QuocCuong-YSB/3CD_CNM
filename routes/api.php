@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CountryController;
 use Illuminate\Http\Request;
@@ -23,7 +24,8 @@ Route::post('/resend', [AuthController::class, 'resendCode']);
 Route::get('/member/country', [CountryController::class, 'index']);
 
 Route::middleware(['auth:sanctum','check.token.expiration', 'level:1'])->group(function () {
-    
+    Route::get('/admin/member', [MemberController::class, 'index']);
+    Route::patch('/admin/member/{id}', [MemberController::class, 'updateStatus']);
 });
 Route::middleware(['auth:sanctum','check.token.expiration', 'level:0'])->group(function () {
    
