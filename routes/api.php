@@ -3,7 +3,7 @@
 use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\BrandController;
-use App\Http\Controllers\CartController;
+use App\Http\Controllers\Member\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\Member\CheckoutController;
