@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
@@ -32,18 +31,30 @@ class CartController extends Controller
         $userId = $request->user()->id;
         $product = Product::findOrFail($request->product_id);
 
+        if ($request->quantity > $product->stock) {
+            return response()->json([
+                'message' => 'Out of stock!',
+            ], 400);
+        }
+
         $cart = Cart::where('user_id', $userId)
             ->where('product_id', $product->id)
             ->first();
 
         if ($cart) {
+            $newQuantity = $cart->quantity + $request->quantity;
+            if ($newQuantity > $product->stock) {
+                return response()->json([
+                    'message' => 'Out of stock!',
+                ], 400);
+            }
             $cart->increment('quantity', $request->quantity);
         } else {
             $cart = Cart::create([
-                'user_id'    => $userId,
+                'user_id' => $userId,
                 'product_id' => $product->id,
-                'quantity'   => $request->quantity,
-                'price'      => $product->price,
+                'quantity' => $request->quantity,
+                'price' => $product->price,
             ]);
         }
 
@@ -60,6 +71,13 @@ class CartController extends Controller
         ]);
 
         $cart = Cart::ofUser($request->user()->id)->findOrFail($id);
+        $product = $cart->product;
+
+        if ($request->quantity > $product->stock) {
+            return response()->json([
+                'message' => 'Out of stock!',
+            ], 400);
+        }
 
         $cart->update([
             'quantity' => $request->quantity,
@@ -70,6 +88,7 @@ class CartController extends Controller
             'data'    => $cart,
         ]);
     }
+
 
     public function destroy(Request $request, $id)
     {
