@@ -20,11 +20,10 @@ class UpdateProductRequest extends BaseRequest
             'price'       => 'required|numeric',
             'detail'      => 'required|string',
             'quantity'    => 'required|integer|min:1',
-            'status'      => 'required|numeric',
             'sale'        => 'required|numeric',
 
-            'image'       => 'nullable|array|max:3',
-            'image.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:1024',
+            'image'   => 'nullable|array|max:3',
+            'image.*' => 'file|max:2048',
 
             // ảnh cần xóa (JSON array)
             'imageDelete' => 'nullable',
@@ -49,11 +48,10 @@ class UpdateProductRequest extends BaseRequest
             'quantity.required' => 'Thiếu quantity',
             'quantity.min' => 'Số lượng phải lớn hơn 0',
 
-            'image.array' => 'Image phải là mảng',
-            'image.max' => 'Chỉ được chọn tối đa 3 file',
-            'image.*.image' => 'File không hợp lệ',
-            'image.*.mimes' => 'Chỉ chấp nhận JPEG, PNG hoặc GIF',
-            'image.*.max' => 'Dung lượng file tối đa 1MB',
+            'image.array'    => 'Image phải là mảng',
+            'image.max'      => 'Chỉ được chọn tối đa 3 file',
+            'image.*.file'   => 'File upload không hợp lệ',
+            'image.*.max'    => 'Dung lượng file phải nhỏ hơn 2MB',
         ];
     }
 }
