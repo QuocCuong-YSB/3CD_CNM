@@ -37,6 +37,8 @@ Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:1'])->prefix
     // Admin Orders
     Route::get('/orders', [AdminOrderController::class, 'index']);
     Route::put('/order/{id}/status', [AdminOrderController::class, 'updateStatus']);
+    
+    Route::post('/logout', [AuthController::class, 'logout']);
 });
 
 Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:0'])->prefix('member')->group(function () {
@@ -57,6 +59,8 @@ Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:0'])->prefix
 
     Route::get('/user', [MemberMemberController::class, 'getProfile']);
     Route::post('/user', [MemberMemberController::class, 'update']);
+
+    Route::post('/logout', [AuthController::class, 'logout']);
 });
 
 

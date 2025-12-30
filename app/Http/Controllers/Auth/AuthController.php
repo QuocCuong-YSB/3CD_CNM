@@ -12,6 +12,7 @@ use App\Mail\SendMail;
 use App\Models\User;
 use App\Models\Verification;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
@@ -131,6 +132,15 @@ class AuthController extends Controller
             'message' => 'Login successful',
             'user' => new UserResource($user),
             'token' => $token,
+        ], 200);
+    }
+    public function logout(Request $request)
+    {
+        $user = $request->user();
+        $user->currentAccessToken()->delete();
+
+        return response()->json([
+            'message' => 'Logout successful'
         ], 200);
     }
 }
