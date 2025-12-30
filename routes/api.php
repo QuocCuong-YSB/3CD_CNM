@@ -11,6 +11,7 @@ use App\Http\Controllers\Member\OrderController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Member\MemberController as MemberMemberController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -18,16 +19,19 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/verify', [AuthController::class, 'verifyCode']);
 Route::post('/resend', [AuthController::class, 'resendCode']);
 Route::get('/member/country', [CountryController::class, 'index']);
+Route::get('/product/search', [ProductController::class, 'search']);
 
 
 Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:1'])->prefix('admin')->group(function () {
     
     Route::get('/product', [ProductController::class, 'index']);
     Route::get('/trash-product', [ProductController::class, 'trash']);
+    Route::get('/trash-product/count', [ProductController::class, 'countTrashProduct']);
     Route::get('/product/show/{id}', [ProductController::class, 'show']);
     Route::post('/product', [ProductController::class, 'store']);
-    Route::put('/product/update/{id}', [ProductController::class, 'update']);
+    Route::post('/product/update/{id}', [ProductController::class, 'update']);
     Route::delete('/product/delete/{id}', [ProductController::class, 'destroy']);
+    Route::delete('/product/delete-many', [ProductController::class, 'deleteMany']);
     Route::patch('/trash-product/restore/{id}', [ProductController::class, 'restore']);
     Route::delete('/trash-product/force-delete/{id}', [ProductController::class, 'forceDelete']);
 
@@ -43,6 +47,9 @@ Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:1'])->prefix
     Route::get('/category/show/{id}', [CategoryController::class, 'show']);
     Route::get('/member', [MemberController::class, 'index']);
     Route::patch('/member/{id}', [MemberController::class, 'updateStatus']);
+
+    Route::get('/user/{id}', [UserController::class, 'show']);
+
     // Admin Orders
     Route::get('/orders', [AdminOrderController::class, 'index']);
     Route::put('/order/{id}/status', [AdminOrderController::class, 'updateStatus']);
