@@ -10,7 +10,7 @@ use App\Http\Controllers\Member\CheckoutController;
 use App\Http\Controllers\Member\OrderController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Member\MemberController as MemberMemberController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Admin\ProductController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -19,21 +19,30 @@ Route::post('/verify', [AuthController::class, 'verifyCode']);
 Route::post('/resend', [AuthController::class, 'resendCode']);
 Route::get('/member/country', [CountryController::class, 'index']);
 
-Route::post('admin/brand', [BrandController::class, 'store']);
-Route::get('/admin/brand', [BrandController::class, 'index']);
-Route::put('/admin/brand/update/{id}', [BrandController::class, 'update']);
-Route::delete('/admin/brand/delete/{id}', [BrandController::class, 'destroy']);
-Route::get('/admin/brand/show/{id}', [BrandController::class, 'show']);
-Route::post('admin/category', [CategoryController::class, 'store']);
-Route::get('/admin/category', [CategoryController::class, 'index']);
-Route::put('/admin/category/update/{id}', [CategoryController::class, 'update']);
-Route::delete('/admin/category/delete/{id}', [CategoryController::class, 'destroy']);
-Route::get('/admin/category/show/{id}', [CategoryController::class, 'show']);
 
 Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:1'])->prefix('admin')->group(function () {
+    
+    Route::get('/product', [ProductController::class, 'index']);
+    Route::get('/trash-product', [ProductController::class, 'trash']);
+    Route::get('/product/show/{id}', [ProductController::class, 'show']);
+    Route::post('/product', [ProductController::class, 'store']);
+    Route::put('/product/update/{id}', [ProductController::class, 'update']);
+    Route::delete('/product/delete/{id}', [ProductController::class, 'destroy']);
+    Route::patch('/trash-product/restore/{id}', [ProductController::class, 'restore']);
+    Route::delete('/trash-product/force-delete/{id}', [ProductController::class, 'forceDelete']);
+
+    Route::post('/brand', [BrandController::class, 'store']);
+    Route::get('/brand', [BrandController::class, 'index']);
+    Route::put('/brand/update/{id}', [BrandController::class, 'update']);
+    Route::delete('/brand/delete/{id}', [BrandController::class, 'destroy']);
+    Route::get('/brand/show/{id}', [BrandController::class, 'show']);
+    Route::post('/category', [CategoryController::class, 'store']);
+    Route::get('/category', [CategoryController::class, 'index']);
+    Route::put('/category/update/{id}', [CategoryController::class, 'update']);
+    Route::delete('/category/delete/{id}', [CategoryController::class, 'destroy']);
+    Route::get('/category/show/{id}', [CategoryController::class, 'show']);
     Route::get('/member', [MemberController::class, 'index']);
     Route::patch('/member/{id}', [MemberController::class, 'updateStatus']);
-
     // Admin Orders
     Route::get('/orders', [AdminOrderController::class, 'index']);
     Route::put('/order/{id}/status', [AdminOrderController::class, 'updateStatus']);

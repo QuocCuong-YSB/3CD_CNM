@@ -21,7 +21,7 @@ class CreateProductsTable extends Migration
             $table->foreignId('id_brand')->constrained('brands');
             
             $table->string('name');
-            $table->string('image');
+            $table->json('image')->nullable();
 
             $table->decimal('price', 15, 2);
             $table->integer('status');
