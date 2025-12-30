@@ -95,15 +95,24 @@ function Header() {
         navigate('/member/home');
     }
     function Logout() {
-        localStorage.removeItem('token');
-        localStorage.removeItem('tokenReferesh');
-        localStorage.removeItem('user');
-        localStorage.removeItem('IdUser');
-        SetCart && SetCart(0);
-        dispath(resetCart());
-        setUser(null);
-        navigate('/');
-        toast.success('Logout thành công');
+        apiMember
+            .post('/logout')
+            .then((res) => {
+                toast.success(res.data.message);
+            })
+            .catch((err) => {
+                console.error(err);
+            })
+            .finally(() => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('tokenReferesh');
+                localStorage.removeItem('user');
+                localStorage.removeItem('IdUser');
+                SetCart && SetCart(0);
+                dispath(resetCart());
+                setUser(null);
+                navigate('/');
+            });
     }
     function Login() {
         navigate('/');
