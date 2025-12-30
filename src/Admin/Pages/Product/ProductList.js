@@ -23,7 +23,7 @@ function ProductList() {
 
     const handleCheckedAll = (e) => {
         if (e.target.checked) {
-            setCheckedItems(data.map((item) => item._id));
+            setCheckedItems(data.map((item) => item.id));
         } else {
             setCheckedItems([]);
         }
@@ -69,7 +69,7 @@ function ProductList() {
             });
             if (result.isConfirmed) {
                 await apiAdmin.delete(`/product/delete/${id}`);
-                setData((prev) => prev.filter((item) => item._id !== id));
+                setData((prev) => prev.filter((item) => item.id !== id));
                 toast.success('Sản phẩm đã được đưa vào thùng rác!');
                 fetchCount();
             }
@@ -98,7 +98,7 @@ function ProductList() {
                                 'Content-Type': 'application/json',
                             },
                         });
-                        setData((prev) => prev.filter((item) => !checkedItems.includes(item._id)));
+                        setData((prev) => prev.filter((item) => !checkedItems.includes(item.id)));
                         toast.success('Sản phẩm đã được đưa vào thùng rác!');
                         fetchCount();
                     }
@@ -163,26 +163,26 @@ function ProductList() {
                         </thead>
                         <tbody>
                             {data.map((item, index) => (
-                                <tr key={item._id}>
+                                <tr key={item.id}>
                                     <td>
                                         <input
                                             type="checkbox"
-                                            value={item._id}
-                                            checked={checkedItems.includes(item._id)}
-                                            onChange={() => handleCheckedItem(item._id)}
+                                            value={item.id}
+                                            checked={checkedItems.includes(item.id)}
+                                            onChange={() => handleCheckedItem(item.id)}
                                         />
                                     </td>
                                     <td>{index + 1}</td>
                                     <td>{item.name}</td>
-                                    <td>{item.id_brand.name}</td>
-                                    <td>{item.id_category?.name ?? ''}</td>
+                                    <td>{item.brand?.name}</td>
+                                    <td>{item.category?.name}</td>
                                     <td>{item.price.toLocaleString('vi-VN')}</td>
                                     <td>{item.quantity}</td>
                                     <td>{item.quantity_sold}</td>
                                     <td>
                                         <img
                                             className={cx('image')}
-                                            src={`http://localhost:3001/${JSON.parse(item.image)[0]}`}
+                                            src={`http://localhost:8000/${item.image[0]}`}
                                             alt=""
                                         />
                                     </td>
@@ -194,7 +194,7 @@ function ProductList() {
                                         >
                                             Chỉnh sửa
                                         </Link>
-                                        <button className={cx('btn-delete')} onClick={() => handleDelete(item._id)}>
+                                        <button className={cx('btn-delete')} onClick={() => handleDelete(item.id)}>
                                             Xóa
                                         </button>
                                     </td>

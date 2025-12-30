@@ -34,7 +34,7 @@ function Category() {
     };
 
     const handleUpdate = async (item) => {
-        setEditId(item._id);
+        setEditId(item.id);
         setName(item.name);
         setCancel(true);
     };
@@ -46,7 +46,7 @@ function Category() {
     const handleSubmitUpdate = async () => {
         try {
             await apiAdmin.put(`/category/update/${editId}`, { name });
-            setData((prev) => prev.map((item) => (item._id === editId ? { ...item, name } : item)));
+            setData((prev) => prev.map((item) => (item.id === editId ? { ...item, name } : item)));
             toast.success('Cập nhật thành công!');
             setName('');
             setEditId(null);
@@ -67,7 +67,7 @@ function Category() {
             });
             if (result.isConfirmed) {
                 await apiAdmin.delete(`/category/delete/${id}`);
-                setData((prev) => prev.filter((item) => item._id !== id));
+                setData((prev) => prev.filter((item) => item.id !== id));
                 toast.success('Danh mục này đã được đưa vào thùng rác!');
             }
         } catch (error) {
@@ -113,7 +113,7 @@ function Category() {
                         </thead>
                         <tbody>
                             {data.map((item, index) => (
-                                <tr key={item._id}>
+                                <tr key={item.id}>
                                     <td>{index + 1}</td>
                                     <td>{item.name}</td>
                                     <td></td>
@@ -121,7 +121,7 @@ function Category() {
                                         <button className={cx('btn-edit')} onClick={() => handleUpdate(item)}>
                                             Chỉnh sửa
                                         </button>
-                                        <button className={cx('btn-delete')} onClick={() => handleDelete(item._id)}>
+                                        <button className={cx('btn-delete')} onClick={() => handleDelete(item.id)}>
                                             Xóa
                                         </button>
                                     </td>

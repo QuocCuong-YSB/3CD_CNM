@@ -12,7 +12,8 @@ function TrashProduct() {
         apiAdmin
             .get('/trash-product')
             .then((res) => {
-                setData(res.data.data);
+                setData(res.data || []);
+                console.log(res.data);
             })
             .catch((error) => {
                 console.log(error);
@@ -22,7 +23,7 @@ function TrashProduct() {
         try {
             const result = await apiAdmin.patch(`/trash-product/restore/${id}`);
             if (result) {
-                setData((prev) => prev.filter((item) => item._id !== id));
+                setData((prev) => prev.filter((item) => item.id !== id));
                 toast.success('Khôi phục sản phẩm thành công!');
             }
         } catch (error) {
@@ -41,7 +42,7 @@ function TrashProduct() {
             });
             if (result.isConfirmed) {
                 await apiAdmin.delete(`/trash-product/force-delete/${id}`);
-                setData((prev) => prev.filter((item) => item._id !== id));
+                setData((prev) => prev.filter((item) => item.id !== id));
                 toast.success('Sản phẩm đã được xóa vĩnh viễn!');
             }
         } catch (error) {
@@ -85,28 +86,25 @@ function TrashProduct() {
                             </tr>
                         ) : (
                             data.map((item, index) => (
-                                <tr key={item._id}>
+                                <tr key={item.id}>
                                     <td>{index + 1}</td>
                                     <td>{item.name}</td>
-                                    <td>{item.id_brand?.name}</td>
-                                    <td>{item.id_category?.name ?? ''}</td>
+                                    <td>{item.brand?.name}</td>
+                                    <td>{item.category?.name}</td>
                                     <td>{item.price.toLocaleString('vi-VN')}</td>
                                     <td>{item.quantity}</td>
                                     <td>
                                         <img
                                             className={cx('image')}
-                                            src={`http://localhost:3001/${JSON.parse(item.image)[0]}`}
+                                            src={`http://localhost:8000/${item.image[0]}`}
                                             alt=""
                                         />
                                     </td>
                                     <td>
-                                        <button className={cx('btn-edit')} onClick={() => handleRestore(item._id)}>
+                                        <button className={cx('btn-edit')} onClick={() => handleRestore(item.id)}>
                                             Khôi phục
                                         </button>
-                                        <button
-                                            className={cx('btn-delete')}
-                                            onClick={() => handleForceDelete(item._id)}
-                                        >
+                                        <button className={cx('btn-delete')} onClick={() => handleForceDelete(item.id)}>
                                             Xóa vĩnh viễn
                                         </button>
                                     </td>
