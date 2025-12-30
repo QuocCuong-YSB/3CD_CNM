@@ -18,16 +18,16 @@ const HeaderAdmin = () => {
 
     const getAvatarSrc = () => {
         if (!user || !user.avatar) {
-            return 'http://localhost:3001/no-image.png';
+            return 'http://localhost:8000/no-image.png';
         }
         try {
             const avatar = typeof user.avatar === 'string' ? JSON.parse(user.avatar) : user.avatar;
             if (Array.isArray(avatar) && avatar.length > 0) {
-                return `http://localhost:3001/${avatar[0]}`;
+                return `http://localhost:8000/${avatar[0]}`;
             }
-            return `http://localhost:3001/${user.avatar}`;
+            return `http://localhost:8000/${user.avatar}`;
         } catch (error) {
-            return `http://localhost:3001/${user.avatar}`;
+            return `http://localhost:8000/${user.avatar}`;
         }
     };
 

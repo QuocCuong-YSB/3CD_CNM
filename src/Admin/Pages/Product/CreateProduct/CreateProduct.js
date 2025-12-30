@@ -39,6 +39,7 @@ function CreateProduct() {
             .get('/category')
             .then((res) => {
                 setCategoryList(res.data.data);
+                console.log(res.data.data);
             })
             .catch();
     };
@@ -62,14 +63,10 @@ function CreateProduct() {
                 formData.append(key, values[key]);
             }
             for (let i = 0; i < image.length; i++) {
-                formData.append('image', image[i]);
+                formData.append('image[]', image[i]);
             }
 
-            await apiAdmin.post('/product', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+            await apiAdmin.post('/product', formData);
             toast.success('Thêm sản phẩm thành công!');
             navigate('/admin/product-list');
         } catch (error) {
@@ -127,7 +124,7 @@ function CreateProduct() {
                                     >
                                         <option value="">-- Chọn danh mục --</option>
                                         {categoryList.map((item) => (
-                                            <option key={item._id} value={item._id}>
+                                            <option key={item.id} value={item.id}>
                                                 {item.name}
                                             </option>
                                         ))}
@@ -146,7 +143,7 @@ function CreateProduct() {
                                     >
                                         <option value="">-- Chọn thương hiệu --</option>
                                         {brandList.map((item) => (
-                                            <option key={item._id} value={item._id}>
+                                            <option key={item.id} value={item.id}>
                                                 {item.name}
                                             </option>
                                         ))}
