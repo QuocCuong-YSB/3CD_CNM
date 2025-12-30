@@ -154,21 +154,22 @@ function UpdateMember() {
                 })
                 .catch((error) => {
                     if (error.response && error.response.data) {
-                        const message =
-                            error.response.data?.error ||
-                            error.response.data?.errors ||
-                            error.response.data?.message ||
-                            error.message;
-                        console.log(error);
-
-                        if (typeof message === 'object' && message !== null) {
-                            const keys = Object.keys(message);
-                            if (keys.length > 0) {
-                                const firstKey = keys[0];
-                                toast.error('Lỗi khi cập nhập : ' + message[firstKey]);
+                        const status = error.response.status;
+                        if (status !== 401 && status !== 403) {
+                            const message =
+                                error.response.data?.error ||
+                                error.response.data?.errors ||
+                                error.response.data?.message ||
+                                error.message;
+                            if (typeof message === 'object' && message !== null) {
+                                const keys = Object.keys(message);
+                                if (keys.length > 0) {
+                                    const firstKey = keys[0];
+                                    toast.error('Lỗi khi cập nhập : ' + message[firstKey]);
+                                }
+                            } else {
+                                toast.error('Lỗi khi cập nhập : ' + message);
                             }
-                        } else {
-                            toast.error('Lỗi khi cập nhập : ' + message);
                         }
                     } else {
                         console.error('Lỗi không xác định:', error);

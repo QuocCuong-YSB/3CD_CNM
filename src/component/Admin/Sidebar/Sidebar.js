@@ -5,16 +5,26 @@ import { FaGlobeAsia, FaSignOutAlt, FaRegListAlt, FaShippingFast } from 'react-i
 import { FaUsers } from 'react-icons/fa';
 import { TbCategoryFilled } from 'react-icons/tb';
 import { toast } from 'react-toastify';
+import apiAdmin from '../../../API/apiAdmin';
 
 const cx = classNames.bind(styles);
 const Sidebar = () => {
     const navigate = useNavigate();
     function Logout() {
-        localStorage.removeItem('adminToken');
-        localStorage.removeItem('adminTokenRefresh');
-        localStorage.removeItem('adminId');
-        navigate('/admin/login');
-        toast.success('Đăng xuất thành công');
+        apiAdmin
+            .post('/logout')
+            .then((res) => {
+                toast.success(res.data.message);
+            })
+            .catch((err) => {
+                console.error(err);
+            })
+            .finally(() => {
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminTokenRefresh');
+                localStorage.removeItem('adminId');
+                navigate('/admin/login');
+            });
     }
     return (
         <div className={cx('sidebar')}>
