@@ -11,6 +11,7 @@ use App\Http\Resources\UserResource;
 use App\Mail\SendMail;
 use App\Models\User;
 use App\Models\Verification;
+use Google\Client as GoogleClient;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -141,6 +142,72 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Logout successful'
+        ], 200);
+    }
+
+    public function loginWithGoogle(Request $request)
+    {
+        $request->validate([
+            'token' => 'required|string'
+        ]);
+
+        $client = new GoogleClient([
+            'client_id' => env('GOOGLE_CLIENT_ID')
+        ]);
+
+        // Verify token với Google
+        $payload = $client->verifyIdToken($request->token);
+
+        if (!$payload) {
+            return response()->json([
+                'message' => 'Token Google không hợp lệ'
+            ], 401);
+        }
+
+        // Thông tin user từ Google
+        $googleId = $payload['sub'];
+        $email    = $payload['email'];
+        $name     = $payload['name'] ?? '';
+        $avatar   = $payload['picture'] ?? '';
+
+        // Tìm user theo google_id hoặc email
+        $user = User::where('google_id', $googleId)
+            ->orWhere('email', $email)
+            ->first();
+
+        if (!$user) {
+            // Chưa có → tạo mới
+            $user = User::create([
+                'name'       => $name,
+                'email'      => $email,
+                'google_id'  => $googleId,
+                'provider'   => 'google',
+                'avatar'     => $avatar,
+                'password'   => '',
+                'level'      => 1,
+                'is_active'  => 1,
+                'address'    => '',
+                'id_country' => 1
+            ]);
+        } else {
+            // Có rồi nhưng chưa liên kết Google
+            if (!$user->google_id) {
+                $user->update([
+                    'google_id' => $googleId,
+                    'provider'  => 'google',
+                    'avatar'    => $avatar
+                ]);
+            }
+        }
+
+        // Tạo token đăng nhập (Sanctum)
+        $tokenInstance = $user->createToken('access-token');
+        $token = $tokenInstance->plainTextToken;
+
+        return response()->json([
+            'message' => 'Login Google thành công',
+            'user'    => $user,
+            'token'   => $token
         ], 200);
     }
 }
