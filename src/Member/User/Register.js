@@ -6,6 +6,7 @@ import './Register.css';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
+
 function RegisterMember() {
     const navigate = useNavigate();
 

@@ -16,7 +16,7 @@ function Header() {
 
     useEffect(() => {
         apiMember
-            .get('/category')
+            .get('/admin/category')
             .then((res) => {
                 if (Array.isArray(res.data.data)) {
                     setCategories(res.data.data);
@@ -246,7 +246,7 @@ function Header() {
                                     </li>
                                     {categories.slice(0, 5).map((category) => (
                                         <li key={category._id}>
-                                            <Link to={`/member/category/${category._id}`}>{category.name}</Link>
+                                            <Link to={`/admin/category/${category._id}`}>{category.name}</Link>
                                         </li>
                                     ))}
                                 </ul>

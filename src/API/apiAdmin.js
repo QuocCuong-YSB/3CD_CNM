@@ -2,6 +2,10 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 const apiAdmin = axios.create({
     baseURL: `http://localhost:8000/api/admin`,
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+    },
 });
 
 apiAdmin.interceptors.request.use((config) => {
