@@ -132,7 +132,7 @@ function HomeList() {
 
                         <Link to={`/member/home/product/detail/${value._id}`}>
                             <div className="product-image">
-                                <img src={`http://localhost:3001/${avatar[0]}`} alt={value.name} />
+                                <img src={`http://localhost:8000/${avatar[0]}`} alt={value.name} />
                             </div>
                         </Link>
 
