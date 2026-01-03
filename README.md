@@ -1,19 +1,18 @@
 # 3CD_CNM
 
 ## Requirements
-- PHP 7.4.33
+- PHP 
 - Composer
 - Laravel 8.x
-- MySQL (XAMPP or Workbench)
+- MySQL (XAMPP or MySQL Workbench)
 
 ## Setup project
 ```bash
-composer install
-cp .env.example .env
-php artisan key:generate
-php artisan serve
 
-## Setup env
-```bash
-npm install
-npm run dev
+composer install
+
+cp .env.example .env
+
+php artisan key:generate
+
+php artisan serve

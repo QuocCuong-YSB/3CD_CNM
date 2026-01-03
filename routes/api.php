@@ -3,7 +3,10 @@
 use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\BrandController;
+
 use App\Http\Controllers\Member\CartController;
+use App\Http\Controllers\Member\ReviewController;
+
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\Member\CheckoutController;
@@ -23,7 +26,7 @@ Route::get('/member/country', [CountryController::class, 'index']);
 Route::get('/product/search', [ProductController::class, 'search']);
 Route::post('/login/google', [AuthController::class, 'loginWithGoogle']);
 
-
+Route::get('/products/{id}/reviews', [ReviewController::class, 'getByProduct']);
 
 
 Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:1'])->prefix('admin')->group(function () {
@@ -81,6 +84,9 @@ Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:0'])->prefix
     Route::post('/user', [MemberMemberController::class, 'update']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    // Review Products
+    Route::post('/review', [ReviewController::class, 'store']);
 });
 
 

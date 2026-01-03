@@ -20,13 +20,13 @@ class CreateReviewsTable extends Migration
 
             $table->foreignId('id_user')->constrained('users')->cascadeOnDelete();
 
-            $table->string('name_user')->nullable();
-            $table->string('avatar_user')->nullable();
+            $table->foreignId('order_id')->constrained()->cascadeOnDelete();
 
-            $table->tinyInteger('rating');
+            $table->tinyInteger('rating'); // 1-5
             $table->text('comment');
-
             $table->timestamps();
+
+            $table->unique(['user_id', 'product_id']);
         });
     }
 
