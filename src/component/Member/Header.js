@@ -71,7 +71,7 @@ function Header() {
         navigate(`/member/home/product/detail/${product._id}`);
     }
 
-    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
+    const [user, setUser] = useState(localStorage.getItem('user'));
 
     useEffect(() => {
         const handleUserUpdate = () => {
@@ -95,15 +95,24 @@ function Header() {
         navigate('/member/home');
     }
     function Logout() {
-        localStorage.removeItem('token');
-        localStorage.removeItem('tokenReferesh');
-        localStorage.removeItem('user');
-        localStorage.removeItem('IdUser');
-        SetCart && SetCart(0);
-        dispath(resetCart());
-        setUser(null);
-        navigate('/');
-        toast.success('Logout thành công');
+        apiMember
+            .post('/logout')
+            .then((res) => {
+                toast.success(res.data.message);
+            })
+            .catch((err) => {
+                console.error(err);
+            })
+            .finally(() => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('tokenReferesh');
+                localStorage.removeItem('user');
+                localStorage.removeItem('IdUser');
+                SetCart && SetCart(0);
+                dispath(resetCart());
+                setUser(null);
+                navigate('/');
+            });
     }
     function Login() {
         navigate('/');
@@ -194,7 +203,7 @@ function Header() {
                                                     }
                                                     return userAvatar ? (
                                                         <img
-                                                            src={`http://localhost:3001/${userAvatar}`}
+                                                            src={user.avatar || `http://localhost:3001/${userAvatar}`}
                                                             alt="Avatar"
                                                             className="user-avatar"
                                                         />

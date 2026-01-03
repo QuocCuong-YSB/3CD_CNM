@@ -33,7 +33,7 @@ function Brand() {
     };
 
     const handleUpdate = (item) => {
-        setEditId(item._id);
+        setEditId(item.id);
         setName(item.name);
         setCancel(true);
     };
@@ -45,7 +45,7 @@ function Brand() {
     const handleSubmitUpdate = async () => {
         try {
             await apiAdmin.put(`/brand/update/${editId}`, { name });
-            setData((prev) => prev.map((item) => (item._id === editId ? { ...item, name } : item)));
+            setData((prev) => prev.map((item) => (item.id === editId ? { ...item, name } : item)));
             toast.success('Cập nhật thành công!');
             setName('');
             setEditId(null);
@@ -66,7 +66,7 @@ function Brand() {
             });
             if (result.isConfirmed) {
                 await apiAdmin.delete(`/brand/delete/${id}`);
-                setData((prev) => prev.filter((item) => item._id !== id));
+                setData((prev) => prev.filter((item) => item.id !== id));
                 toast.success('Thương hiệu đã được đưa vào thùng rác!');
             }
         } catch (error) {
@@ -112,7 +112,7 @@ function Brand() {
                         </thead>
                         <tbody>
                             {data.map((item, index) => (
-                                <tr key={item._id}>
+                                <tr key={item.id}>
                                     <td>{index + 1}</td>
                                     <td>{item.name}</td>
                                     <td></td>
@@ -120,7 +120,7 @@ function Brand() {
                                         <button className={cx('btn-edit')} onClick={() => handleUpdate(item)}>
                                             Chỉnh sửa
                                         </button>
-                                        <button className={cx('btn-delete')} onClick={() => handleDelete(item._id)}>
+                                        <button className={cx('btn-delete')} onClick={() => handleDelete(item.id)}>
                                             Xóa
                                         </button>
                                     </td>

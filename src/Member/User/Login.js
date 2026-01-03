@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiMember from '../../API/apiMember';
+import { GoogleLogin } from '@react-oauth/google';
 import auth from '../../API/auth';
 import './Login.css';
 import { toast } from 'react-toastify';
@@ -83,6 +84,16 @@ function LoginMember() {
         e.preventDefault();
         navigate('/member/register');
     }
+
+    const handleSuccess = async (credentialResponse) => {
+        const idToken = credentialResponse.credential;
+
+        const res = await auth.post('/login/google', { token: idToken });
+
+        localStorage.setItem('token-google', res.data.token);
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+        navigate('/member/home');
+    };
     return (
         <div className="login">
             <h2>ĐĂNG NHẬP</h2>
@@ -118,6 +129,7 @@ function LoginMember() {
                 <button className="login_member" onClick={(e) => checkInput(e)}>
                     ĐĂNG NHẬP
                 </button>
+                <GoogleLogin onSuccess={handleSuccess} onError={() => console.log('Login Failed')} />
 
                 <ul className="auth-links">
                     <li>Bạn chưa có tài khoản?</li>

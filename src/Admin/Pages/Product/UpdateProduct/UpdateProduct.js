@@ -10,7 +10,7 @@ function UpdateProduct() {
     const navigate = useNavigate();
     const location = useLocation();
     const data = location.state.data;
-    const id = data._id;
+    const id = data.id;
     const [name, setName] = useState('');
     const [category, setCategory] = useState('');
     const [brand, setBrand] = useState('');
@@ -26,12 +26,12 @@ function UpdateProduct() {
     useEffect(() => {
         if (data) {
             setName(data.name || '');
-            setCategory(data.id_category?._id || '');
-            setBrand(data.id_brand?._id || '');
+            setCategory(data.id_category?.id || '');
+            setBrand(data.id_brand?.id || '');
             setPrice(data.price || 0);
             setSale(data.sale || 0);
             setQuality(data.quantity || 0);
-            setImage(JSON.parse(data.image) || []);
+            setImage(data.image || []);
             setDetail(data.detail || '');
         }
     }, [data]);
@@ -95,11 +95,7 @@ function UpdateProduct() {
             if (imageDelete.length > 0) {
                 formData.append('imageDelete', JSON.stringify(imageDelete));
             }
-            await apiAdmin.put(`/product/update/${id}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+            await apiAdmin.post(`/product/update/${id}`, formData);
             toast.success('Cập nhật sản phẩm thành công!');
             navigate('/admin/product-list');
         } catch (error) {
@@ -129,7 +125,7 @@ function UpdateProduct() {
                             <select name="id_category" value={category} onChange={(e) => setCategory(e.target.value)}>
                                 <option value="">-- Chọn danh mục --</option>
                                 {categoryList.map((item) => (
-                                    <option key={item._id} value={item._id}>
+                                    <option key={item.id} value={item.id}>
                                         {item.name}
                                     </option>
                                 ))}
@@ -141,7 +137,7 @@ function UpdateProduct() {
                             <select name="id_brand" value={brand} onChange={(e) => setBrand(e.target.value)}>
                                 <option value="">-- Chọn thương hiệu --</option>
                                 {brandList.map((item) => (
-                                    <option key={item._id} value={item._id}>
+                                    <option key={item.id} value={item.id}>
                                         {item.name}
                                     </option>
                                 ))}
@@ -185,7 +181,7 @@ function UpdateProduct() {
                                             src={
                                                 file instanceof File
                                                     ? URL.createObjectURL(file)
-                                                    : `http://localhost:3001/${file}`
+                                                    : `http://localhost:8000/${file}`
                                             }
                                             alt="preview"
                                             className={cx('preview')}

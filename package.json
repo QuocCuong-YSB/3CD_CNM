@@ -8,6 +8,7 @@
     "@coreui/react": "^5.9.1",
     "@fortawesome/fontawesome-free": "^7.0.0",
     "@paypal/react-paypal-js": "^8.9.2",
+    "@react-oauth/google": "^0.13.4",
     "@reduxjs/toolkit": "^2.8.2",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.6.4",
