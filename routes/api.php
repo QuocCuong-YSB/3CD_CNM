@@ -23,6 +23,10 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/verify', [AuthController::class, 'verifyCode']);
 Route::post('/resend', [AuthController::class, 'resendCode']);
 Route::get('/member/country', [CountryController::class, 'index']);
+Route::get('/member/category', [CategoryController::class, 'index']);
+Route::get('/member/brand', [BrandController::class, 'index']);
+Route::get('/member/product', [ProductController::class, 'index']);
+Route::get('/member/product/show/{id}', [ProductController::class, 'show']);
 Route::get('/product/search', [ProductController::class, 'search']);
 Route::post('/login/google', [AuthController::class, 'loginWithGoogle']);
 
@@ -30,7 +34,7 @@ Route::get('/products/{id}/reviews', [ReviewController::class, 'getByProduct']);
 
 
 Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:1'])->prefix('admin')->group(function () {
-    
+
     Route::get('/product', [ProductController::class, 'index']);
     Route::get('/trash-product', [ProductController::class, 'trash']);
     Route::get('/trash-product/count', [ProductController::class, 'countTrashProduct']);
@@ -60,7 +64,7 @@ Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:1'])->prefix
     // Admin Orders
     Route::get('/orders', [AdminOrderController::class, 'index']);
     Route::put('/order/{id}/status', [AdminOrderController::class, 'updateStatus']);
-    
+
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
