@@ -5,7 +5,6 @@
 - Composer
 - Laravel 8.x
 - MySQL (XAMPP or MySQL Workbench)
-- Node.js & NPM
 
 ## Setup project
 ```bash

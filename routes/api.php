@@ -3,7 +3,10 @@
 use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\BrandController;
+
 use App\Http\Controllers\Member\CartController;
+use App\Http\Controllers\Member\ReviewController;
+
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\Member\CheckoutController;
@@ -29,6 +32,8 @@ Route::put('/admin/category/update/{id}', [CategoryController::class, 'update'])
 Route::delete('/admin/category/delete/{id}', [CategoryController::class, 'destroy']);
 Route::get('/admin/category/show/{id}', [CategoryController::class, 'show']);
 
+Route::get('/products/{id}/reviews', [ReviewController::class, 'getReviewByProduct']);
+
 Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:1'])->prefix('admin')->group(function () {
     Route::get('/member', [MemberController::class, 'index']);
     Route::patch('/member/{id}', [MemberController::class, 'updateStatus']);
@@ -53,6 +58,9 @@ Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:0'])->prefix
     Route::put('/cart/{id}', [CartController::class, 'update']);
     Route::delete('/cart/{id}', [CartController::class, 'destroy']);
     Route::delete('/cart', [CartController::class, 'clear']);
+
+    // Review Products
+    Route::post('/review', [ReviewController::class, 'store']);
 });
 
 
