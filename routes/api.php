@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Member\MemberController as MemberMemberController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\ChatController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -87,6 +88,15 @@ Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:0'])->prefix
 
     // Review Products
     Route::post('/review', [ReviewController::class, 'store']);
+});
+Route::middleware(['auth:sanctum', 'check.token.expiration'])->group(function () {
+
+    Route::post('/send-message', [ChatController::class, 'send']);
+    Route::get('/messages/{userId}', [ChatController::class, 'history']);
+    Route::get('/conversations', [ChatController::class, 'conversations']);
+    Route::post('/mark-as-read', [ChatController::class, 'markAsRead']);
+    Route::get('/unread-count', [ChatController::class, 'unreadCount']);
+    Route::get('/history', [ChatController::class, 'historyUser']);
 });
 
 
