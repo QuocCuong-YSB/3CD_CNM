@@ -90,8 +90,9 @@ function LoginMember() {
 
         const res = await auth.post('/login/google', { token: idToken });
 
-        localStorage.setItem('token-google', res.data.token);
+        localStorage.setItem('token', res.data.token);
         localStorage.setItem('user', JSON.stringify(res.data.user));
+        localStorage.setItem('IdUser', JSON.stringify(res.data.user.id));
         navigate('/member/home');
     };
     return (
