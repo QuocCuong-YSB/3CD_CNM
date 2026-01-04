@@ -20,7 +20,7 @@ class CheckTokenExpiration
         $user = $request->user();
         $token = $user->currentAccessToken();
 
-        if ($token->expires_at && Carbon::parse($token->expires_at)->lt(now())) {
+        if ($token && $token->expires_at && Carbon::parse($token->expires_at)->lt(now())) {
             $token->delete();
             return response()->json(['message' => 'Token expired'], 401);
         }

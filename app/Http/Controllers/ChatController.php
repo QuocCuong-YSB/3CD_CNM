@@ -46,15 +46,15 @@ class ChatController extends Controller
 
         $messages = Message::where(function ($q) use ($currentUserId, $userId) {
             $q->where('sender_id', $currentUserId)
-              ->where('receiver_id', $userId);
+                ->where('receiver_id', $userId);
         })
-        ->orWhere(function ($q) use ($currentUserId, $userId) {
-            $q->where('sender_id', $userId)
-              ->where('receiver_id', $currentUserId);
-        })
-        ->with(['sender:id,name,email', 'receiver:id,name,email'])
-        ->orderBy('created_at', 'asc')
-        ->get();
+            ->orWhere(function ($q) use ($currentUserId, $userId) {
+                $q->where('sender_id', $userId)
+                    ->where('receiver_id', $currentUserId);
+            })
+            ->with(['sender:id,name,email', 'receiver:id,name,email'])
+            ->orderBy('created_at', 'asc')
+            ->get();
 
         Message::where('sender_id', $userId)
             ->where('receiver_id', $currentUserId)
@@ -91,11 +91,11 @@ class ChatController extends Controller
                 $lastMessage = Message::where(function ($q) use ($userId, $user) {
                     $q->where('sender_id', $userId)->where('receiver_id', $user->id);
                 })
-                ->orWhere(function ($q) use ($userId, $user) {
-                    $q->where('sender_id', $user->id)->where('receiver_id', $userId);
-                })
-                ->orderBy('created_at', 'desc')
-                ->first();
+                    ->orWhere(function ($q) use ($userId, $user) {
+                        $q->where('sender_id', $user->id)->where('receiver_id', $userId);
+                    })
+                    ->orderBy('created_at', 'desc')
+                    ->first();
 
                 $unreadCount = Message::where('sender_id', $user->id)
                     ->where('receiver_id', $userId)
@@ -141,17 +141,17 @@ class ChatController extends Controller
     public function historyUser(Request $request)
     {
         $request->validate([
-            'user_id'  => 'required|integer',
+            'user_id' => 'required|integer',
             'admin_id' => 'required|integer',
         ]);
 
-        $messages = Message::where(function($q) use ($request) {
-                $q->where('sender_id', $request->user_id)
-                  ->orWhere('receiver_id', $request->user_id);
-            })
-            ->where(function($q) use ($request) {
+        $messages = Message::where(function ($q) use ($request) {
+            $q->where('sender_id', $request->user_id)
+                ->orWhere('receiver_id', $request->user_id);
+        })
+            ->where(function ($q) use ($request) {
                 $q->where('sender_id', $request->admin_id)
-                  ->orWhere('receiver_id', $request->admin_id);
+                    ->orWhere('receiver_id', $request->admin_id);
             })
             ->orderBy('created_at', 'asc')
             ->get();

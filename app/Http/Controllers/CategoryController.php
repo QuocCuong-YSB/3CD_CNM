@@ -16,6 +16,22 @@ class CategoryController extends Controller
         ], 200);
     }
 
+    public function getSidebarData()
+    {
+        $categories = Category::select('id', 'name')->get();
+        $brands = \App\Models\Brand::select('id', 'name')->get();
+        $maxPrice = \App\Models\Product::max('price') ?? 0;
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'categories' => $categories,
+                'brands' => $brands,
+                'maxPrice' => (int) $maxPrice
+            ]
+        ], 200);
+    }
+
     /**
      * POST /categories
      */

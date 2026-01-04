@@ -26,12 +26,14 @@ Route::post('/resend', [AuthController::class, 'resendCode']);
 Route::get('/member/country', [CountryController::class, 'index']);
 Route::get('/member/category', [CategoryController::class, 'index']);
 Route::get('/member/brand', [BrandController::class, 'index']);
+Route::get('/member/sidebar-data', [CategoryController::class, 'getSidebarData']);
 Route::get('/member/product', [ProductController::class, 'index']);
 Route::get('/member/product/show/{id}', [ProductController::class, 'show']);
 Route::get('/product/search', [ProductController::class, 'search']);
 Route::post('/login/google', [AuthController::class, 'loginWithGoogle']);
 
 Route::get('/products/{id}/reviews', [ReviewController::class, 'getByProduct']);
+Route::get('/member/product/{id}/reviews', [ReviewController::class, 'getByProduct']);
 
 
 Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:1'])->prefix('admin')->group(function () {
@@ -93,8 +95,7 @@ Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:0'])->prefix
     // Review Products
     Route::post('/review', [ReviewController::class, 'store']);
 });
-Route::middleware(['auth:sanctum', 'check.token.expiration'])->group(function () {
-
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/send-message', [ChatController::class, 'send']);
     Route::get('/messages/{userId}', [ChatController::class, 'history']);
     Route::get('/conversations', [ChatController::class, 'conversations']);

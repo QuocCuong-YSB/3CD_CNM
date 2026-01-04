@@ -13,16 +13,16 @@ class ReviewController extends Controller
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'order_id'   => 'required|exists:orders,id',
-            'rating'     => 'required|integer|min:1|max:5',
-            'comment'    => 'required|string',
+            'order_id' => 'required|exists:orders,id',
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'required|string',
         ]);
 
         $userId = $request->user()->id;
 
         $order = Order::where('id', $request->order_id)
             ->where('user_id', $userId)
-            ->where('status', 'delivered') 
+            ->where('status', 'delivered')
             ->first();
 
         if (!$order) {
@@ -52,26 +52,26 @@ class ReviewController extends Controller
         }
 
         $review = Review::addReview([
-            'user_id'    => $userId,
+            'user_id' => $userId,
             'product_id' => $request->product_id,
-            'order_id'  => $order->id,
-            'rating'    => $request->rating,
-            'comment'   => $request->comment,
+            'order_id' => $order->id,
+            'rating' => $request->rating,
+            'comment' => $request->comment,
         ]);
 
         return response()->json([
             'message' => 'Đánh giá thành công',
-            'data'    => $review,
+            'data' => $review,
         ], 201);
     }
 
-    public function getReviewByProduct($productId)
+    public function getByProduct($productId)
     {
         $reviews = Review::getReviewsByProduct($productId);
 
         return response()->json([
             'success' => true,
-            'data'    => $reviews,
+            'data' => $reviews,
         ]);
     }
 }
