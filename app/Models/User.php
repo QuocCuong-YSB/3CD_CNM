@@ -28,6 +28,8 @@ class User extends Authenticatable
         'address',
         'id_country',
         'avatar',
+        'google_id',
+        'provider',
 
     ];
 

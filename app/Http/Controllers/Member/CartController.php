@@ -18,7 +18,7 @@ class CartController extends Controller
         return response()->json([
             'success' => true,
             'data' => $carts
-        ]);
+        ], 200);
     }
 
     public function store(Request $request)
@@ -43,25 +43,28 @@ class CartController extends Controller
 
         if ($cart) {
             $newQuantity = $cart->quantity + $request->quantity;
+
             if ($newQuantity > $product->stock) {
                 return response()->json([
                     'message' => 'Out of stock!',
                 ], 400);
             }
-            $cart->increment('quantity', $request->quantity);
+
+            $cart->update([
+                'quantity' => $newQuantity
+            ]);
         } else {
             $cart = Cart::create([
-                'user_id' => $userId,
+                'user_id'    => $userId,
                 'product_id' => $product->id,
-                'quantity' => $request->quantity,
-                'price' => $product->price,
+                'quantity'   => $request->quantity,
             ]);
         }
 
         return response()->json([
-            'message' => 'Product added to cart',
-            'data'    => $cart,
-        ], 201);
+            'message' => 'Product added to cart successfully',
+            'data'    => $cart->load('product'),
+        ], 200);
     }
 
     public function update(Request $request, $id)
@@ -70,10 +73,11 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1',
         ]);
 
-        $cart = Cart::ofUser($request->user()->id)->findOrFail($id);
-        $product = $cart->product;
+        $cart = Cart::ofUser($request->user()->id)
+            ->with('product')
+            ->findOrFail($id);
 
-        if ($request->quantity > $product->stock) {
+        if ($request->quantity > $cart->product->stock) {
             return response()->json([
                 'message' => 'Out of stock!',
             ], 400);
@@ -86,9 +90,8 @@ class CartController extends Controller
         return response()->json([
             'message' => 'Cart updated successfully',
             'data'    => $cart,
-        ]);
+        ], 200);
     }
-
 
     public function destroy(Request $request, $id)
     {
@@ -96,8 +99,8 @@ class CartController extends Controller
         $cart->delete();
 
         return response()->json([
-            'message' => 'Item removed from cart',
-        ]);
+            'message' => 'Item removed from cart successfully',
+        ], 200);
     }
 
     public function clear(Request $request)
@@ -106,6 +109,6 @@ class CartController extends Controller
 
         return response()->json([
             'message' => 'Cart cleared successfully',
-        ]);
+        ], 200);
     }
 }

@@ -19,7 +19,6 @@ class CreateCartsTable extends Migration {
                 ->cascadeOnDelete();
 
             $table->integer('quantity')->default(1);
-            $table->decimal('price', 15, 2);
 
             $table->timestamps();
 

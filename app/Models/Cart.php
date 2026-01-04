@@ -6,19 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Cart extends Model
 {
-
-    protected $table = 'carts';
-
     protected $fillable = [
         'user_id',
         'product_id',
         'quantity',
-        'price',
     ];
 
     protected $casts = [
         'quantity' => 'integer',
-        'price' => 'decimal:2',
     ];
 
     protected static function booted()
@@ -47,6 +42,6 @@ class Cart extends Model
 
     public function getSubtotalAttribute()
     {
-        return $this->quantity * $this->price;
+        return $this->quantity * ($this->product->price ?? 0);
     }
 }
