@@ -9,7 +9,11 @@ import { useLocation } from 'react-router-dom';
 import { ToastContainer, Bounce } from 'react-toastify';
 import LeftSideMyPD from './component/Member/LeftSideMyPD';
 import DefaultLayout from './Admin/Layouts/DefaultLayout';
+import ChatMember from './component/Member/Chat/ChatMember';
 function App(props) {
+    let userId = localStorage.getItem('IdUser');
+    let token = localStorage.getItem('token');
+
     const location = useLocation();
     const path = location.pathname;
     const isCheckoutPage = path.includes('/checkout');
@@ -55,8 +59,10 @@ function App(props) {
                                     )}
                                 </div>
                             </div>
+
                             {<Footer />}
                         </div>
+                        <ChatMember userId={userId} token={token} userAdmin={2} />
                     </Provider>
                 </UserProvider>
             )}
