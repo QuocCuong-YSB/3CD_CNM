@@ -68,7 +68,7 @@ function Header() {
         setKeyword('');
         setSuggestions([]);
         dispath(setSearch(''));
-        navigate(`/member/home/product/detail/${product._id}`);
+        navigate(`/member/home/product/detail/${product.id}`);
     }
 
     const [user, setUser] = useState(localStorage.getItem('user'));
@@ -161,7 +161,7 @@ function Header() {
 
                                                     return (
                                                         <li
-                                                            key={product._id}
+                                                            key={product.id}
                                                             onMouseDown={() => handleSuggestionClick(product)}
                                                         >
                                                             <img
@@ -254,8 +254,8 @@ function Header() {
                                         <Link to="/member/home">Trang chủ</Link>
                                     </li>
                                     {categories.slice(0, 5).map((category) => (
-                                        <li key={category._id}>
-                                            <Link to={`/member/category/${category._id}`}>{category.name}</Link>
+                                        <li key={category.id}>
+                                            <Link to={`/member/category/${category.id}`}>{category.name}</Link>
                                         </li>
                                     ))}
                                 </ul>

@@ -62,9 +62,9 @@ function CheckOut() {
     });
 
     useEffect(() => {
-        if (user && user._id) {
+        if (user && user.id) {
             apiMember
-                .get(`/order/user/${user._id}`, config)
+                .get(`/order/user/${user.id}`, config)
                 .then((res) => {
                     const orders = Array.isArray(res.data.data) ? res.data.data : [];
                     const validOrders = orders.filter((o) => o.status !== 3);
@@ -133,7 +133,7 @@ function CheckOut() {
 
             return (
                 <div className="order-product-item" key={index}>
-                    <img src={`http://localhost:3001/${avatar[0] || 'no-image.png'}`} alt={value.name} />
+                    <img src={`http://localhost:8000/${avatar[0] || 'no-image.png'}`} alt={value.name} />
                     <div className="order-product-info">
                         <span className="name">
                             {value.name} (x{value.qty})
@@ -152,7 +152,7 @@ function CheckOut() {
             return Promise.reject('Chưa đăng nhập');
         }
 
-        if (!user._id && !user.id) {
+        if (!user.id) {
             console.error('User object missing ID:', user);
             toast.error('Lỗi thông tin người dùng. Vui lòng đăng nhập lại.');
             localStorage.removeItem('user');

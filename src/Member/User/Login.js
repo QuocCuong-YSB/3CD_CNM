@@ -86,14 +86,21 @@ function LoginMember() {
     }
 
     const handleSuccess = async (credentialResponse) => {
-        const idToken = credentialResponse.credential;
+        try {
+            const idToken = credentialResponse.credential;
+            const res = await auth.post('/login/google', { token: idToken });
 
-        const res = await auth.post('/login/google', { token: idToken });
+            localStorage.setItem('token', res.data.token);
+            localStorage.setItem('user', JSON.stringify(res.data.user));
+            localStorage.setItem('IdUser', res.data.user.id);
 
-        localStorage.setItem('token', res.data.token);
-        localStorage.setItem('user', JSON.stringify(res.data.user));
-        localStorage.setItem('IdUser', JSON.stringify(res.data.user.id));
-        navigate('/member/home');
+            window.dispatchEvent(new Event('user-updated'));
+            toast.success('Đăng nhập bằng Google thành công');
+            navigate('/member/home');
+        } catch (error) {
+            console.error('Google Login Error:', error);
+            toast.error('Đăng nhập bằng Google thất bại');
+        }
     };
     return (
         <div className="login">

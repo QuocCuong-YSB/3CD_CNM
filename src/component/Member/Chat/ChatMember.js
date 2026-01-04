@@ -40,9 +40,25 @@ const ChatMember = ({ userId, token, userAdmin }) => {
     }, [messages, isOpen]);
 
     useEffect(() => {
-        if (pusherRef.current) return;
+        if (!userId || !token) {
+            if (pusherRef.current) {
+                console.log('🔌 Disconnecting Pusher (Logged out)');
+                pusherRef.current.disconnect();
+                pusherRef.current = null;
+                channelRef.current = null;
+            }
+            return;
+        }
 
-        console.log('🔌 Initializing Pusher ONCE for User ID:', userId);
+        if (pusherRef.current && pusherRef.current.initializedUserId === userId) {
+            return;
+        }
+
+        if (pusherRef.current) {
+            pusherRef.current.disconnect();
+        }
+
+        console.log('🔌 Initializing Pusher for User ID:', userId);
 
         pusherRef.current = new Pusher('bf2c2c6cc1b747ed5016', {
             cluster: 'ap1',
@@ -54,6 +70,7 @@ const ChatMember = ({ userId, token, userAdmin }) => {
                 },
             },
         });
+        pusherRef.current.initializedUserId = userId;
 
         const channelName = `private-chat.${userId}`;
         console.log('📡 Subscribing to channel:', channelName);
@@ -65,7 +82,9 @@ const ChatMember = ({ userId, token, userAdmin }) => {
         });
 
         loadUnreadCount();
-    }, []);
+
+        return () => {};
+    }, [userId, token]);
 
     useEffect(() => {
         if (!channelRef.current) return;
@@ -90,11 +109,16 @@ const ChatMember = ({ userId, token, userAdmin }) => {
 
     const loadUnreadCount = async () => {
         try {
-            const response = await axiosInstance.get('/unread-count');
+            console.log('📡 Fetching unread count from:', `${API_URL}/unread-count`);
+            const response = await axiosInstance.get('unread-count');
             setUnreadCount(response.data.unread_count);
             console.log('📬 Unread count:', response.data.unread_count);
         } catch (error) {
-            console.error('Error loading unread count:', error);
+            console.error('❌ Error loading unread count:', error);
+            if (error.response) {
+                console.error('Error Status:', error.response.status);
+                console.error('Error Data:', error.response.data);
+            }
         }
     };
 

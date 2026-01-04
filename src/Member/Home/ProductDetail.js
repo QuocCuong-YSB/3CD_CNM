@@ -32,10 +32,16 @@ function ProductDetail() {
     const [showReviewForm, setShowReviewForm] = useState(false);
 
     useEffect(() => {
-        apiMember.get('/product/' + id).then((res) => {
-            SetInput(res.data.data);
-            if (res.data?.data?.image) {
-                const avatar = JSON.parse(res.data.data.image);
+        apiMember.get('/product/show/' + id).then((res) => {
+            const productData = res.data;
+            SetInput(productData);
+            if (productData?.image) {
+                let avatar = [];
+                try {
+                    avatar = typeof productData.image === 'string' ? JSON.parse(productData.image) : productData.image;
+                } catch (e) {
+                    avatar = Array.isArray(productData.image) ? productData.image : [productData.image];
+                }
                 SetselectedImg(avatar[0]);
             }
         });
@@ -167,7 +173,14 @@ function ProductDetail() {
         if (starCounts[r.rating] !== undefined) starCounts[r.rating]++;
     });
     function renderData() {
-        const avatar = input?.image ? JSON.parse(input.image) : [];
+        let avatar = [];
+        if (input?.image) {
+            try {
+                avatar = typeof input.image === 'string' ? JSON.parse(input.image) : input.image;
+            } catch (e) {
+                avatar = Array.isArray(input.image) ? input.image : [input.image];
+            }
+        }
 
         const is_on_sale = input.sale > 0;
         const original_price = input.price;
@@ -178,14 +191,14 @@ function ProductDetail() {
             <div className="product-details-new">
                 <div className="col-sm-5 product-image-gallery">
                     <div className="main-image">
-                        <img src={`http://localhost:3001/${selectedImg}`} alt="Main product" />
+                        <img src={`http://localhost:8000/${selectedImg}`} alt="Main product" />
                     </div>
                     <div className="thumbnail-list">
                         {avatar.map((value, index) => {
                             return (
                                 <img
                                     key={index}
-                                    src={`http://localhost:3001/${value}`}
+                                    src={`http://localhost:8000/${value}`}
                                     alt={`Thumbnail ${index + 1}`}
                                     onClick={() => SetselectedImgTop(value)}
                                     className={selectedImg === value ? 'active' : ''}
@@ -284,7 +297,7 @@ function ProductDetail() {
                     items={[
                         { label: 'Sản Phẩm', path: '/member/home' },
                         ...(input.id_category
-                            ? [{ label: input.id_category.category, path: `/member/category/${input.id_category._id}` }]
+                            ? [{ label: input.id_category.name, path: `/member/category/${input.id_category.id}` }]
                             : []),
                         { label: input.name },
                     ]}
