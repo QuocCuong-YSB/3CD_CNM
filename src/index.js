@@ -26,6 +26,7 @@ import Category from './Admin/Pages/Category/Category';
 import Brand from './Admin/Pages/Brand/Brand';
 import Member from './Admin/Pages/Member/Member';
 import MemberProtectedRoute from './component/Member/MemberProtectedRoute';
+import Message from './Admin/Pages/Message/Message';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -44,6 +45,7 @@ root.render(
                         <Route path="/admin/register" element={<RegisterTest />} />
                         <Route path="/admin/login" element={<LoginTest />} />
                         <Route path="/admin/member" element={<Member />} />
+                        <Route path="/admin/messages" element={<Message />} />
                         <Route path="/admin/order-list" element={<OrderListAdmin />} />
                         <Route path="/admin/product-list" element={<ProductListAdmin />} />
                         <Route path="/admin/product/create-product" element={<CreateProduct />} />
