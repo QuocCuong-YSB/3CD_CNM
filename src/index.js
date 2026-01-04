@@ -5,6 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { PayPalScriptProvider } from '@paypal/react-paypal-js';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import RegisterMember from './Member/User/Register';
 import LoginMember from './Member/User/Login';
 import UpdateMember from './Member/User/Update';
@@ -40,46 +41,48 @@ root.render(
             }}
         >
             <BrowserRouter>
-                <App>
-                    <Routes>
-                        <Route path="/admin/register" element={<RegisterTest />} />
-                        <Route path="/admin/login" element={<LoginTest />} />
-                        <Route path="/admin/member" element={<Member />} />
-                        <Route path="/admin/messages" element={<Message />} />
-                        <Route path="/admin/order-list" element={<OrderListAdmin />} />
-                        <Route path="/admin/product-list" element={<ProductListAdmin />} />
-                        <Route path="/admin/product/create-product" element={<CreateProduct />} />
-                        <Route path="/admin/product/update-product" element={<UpdateProduct />} />
-                        <Route path="/admin/product/trash-product" element={<TrashProduct />} />
-                        <Route path="/admin/category" element={<Category />} />
-                        <Route path="/admin/brand" element={<Brand />} />
-                        <Route path="/member/register" element={<RegisterMember />} />
-                        <Route index path="/" element={<LoginMember />} />
-                        <Route path="/member/account/update" element={<UpdateMember />} />
-                        <Route path="/member/account/product/add" element={<ProductAdd />} />
-                        <Route path="/member/account/product/list" element={<OrderList />} />
-                        <Route path="/member/account/product/update/:id" element={<ProductUpdate />} />
-                        <Route path="/member/home" element={<HomeList />} />
-                        <Route path="/member/category/:categoryId" element={<HomeList />} />
-                        <Route path="/member/home/product/detail/:id" element={<ProductDetail />} />
-                        <Route
-                            path="/member/home/cart"
-                            element={
-                                <MemberProtectedRoute>
-                                    <CartProduct />
-                                </MemberProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/member/product/checkout"
-                            element={
-                                <MemberProtectedRoute>
-                                    <CheckOut />
-                                </MemberProtectedRoute>
-                            }
-                        />
-                    </Routes>
-                </App>
+                <GoogleOAuthProvider clientId="863364360698-gaoeh93o8u2f7s5tr2tnveqg5qb7smrp.apps.googleusercontent.com">
+                    <App>
+                        <Routes>
+                            <Route path="/admin/register" element={<RegisterTest />} />
+                            <Route path="/admin/login" element={<LoginTest />} />
+                            <Route path="/admin/member" element={<Member />} />
+                            <Route path="/admin/messages" element={<Message />} />
+                            <Route path="/admin/order-list" element={<OrderListAdmin />} />
+                            <Route path="/admin/product-list" element={<ProductListAdmin />} />
+                            <Route path="/admin/product/create-product" element={<CreateProduct />} />
+                            <Route path="/admin/product/update-product" element={<UpdateProduct />} />
+                            <Route path="/admin/product/trash-product" element={<TrashProduct />} />
+                            <Route path="/admin/category" element={<Category />} />
+                            <Route path="/admin/brand" element={<Brand />} />
+                            <Route path="/member/register" element={<RegisterMember />} />
+                            <Route index path="/" element={<LoginMember />} />
+                            <Route path="/member/account/update" element={<UpdateMember />} />
+                            <Route path="/member/account/product/add" element={<ProductAdd />} />
+                            <Route path="/member/account/product/list" element={<OrderList />} />
+                            <Route path="/member/account/product/update/:id" element={<ProductUpdate />} />
+                            <Route path="/member/home" element={<HomeList />} />
+                            <Route path="/member/category/:categoryId" element={<HomeList />} />
+                            <Route path="/member/home/product/detail/:id" element={<ProductDetail />} />
+                            <Route
+                                path="/member/home/cart"
+                                element={
+                                    <MemberProtectedRoute>
+                                        <CartProduct />
+                                    </MemberProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/member/product/checkout"
+                                element={
+                                    <MemberProtectedRoute>
+                                        <CheckOut />
+                                    </MemberProtectedRoute>
+                                }
+                            />
+                        </Routes>
+                    </App>
+                </GoogleOAuthProvider>
             </BrowserRouter>
         </PayPalScriptProvider>
     </React.StrictMode>,

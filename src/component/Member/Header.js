@@ -71,7 +71,7 @@ function Header() {
         navigate(`/member/home/product/detail/${product._id}`);
     }
 
-    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
+    const [user, setUser] = useState(localStorage.getItem('user'));
 
     useEffect(() => {
         const handleUserUpdate = () => {
@@ -203,7 +203,7 @@ function Header() {
                                                     }
                                                     return userAvatar ? (
                                                         <img
-                                                            src={`http://localhost:3001/${userAvatar}`}
+                                                            src={user.avatar || `http://localhost:3001/${userAvatar}`}
                                                             alt="Avatar"
                                                             className="user-avatar"
                                                         />
