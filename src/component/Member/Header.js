@@ -156,7 +156,7 @@ function Header() {
                                                 {suggestions.map((product) => {
                                                     let avatar = '';
                                                     try {
-                                                        avatar = JSON.parse(product.image)[0];
+                                                        avatar = product.image[0];
                                                     } catch (e) {}
 
                                                     return (
@@ -165,7 +165,7 @@ function Header() {
                                                             onMouseDown={() => handleSuggestionClick(product)}
                                                         >
                                                             <img
-                                                                src={`http://localhost:3001/${avatar}`}
+                                                                src={`http://localhost:8000/${avatar}`}
                                                                 alt={product.name}
                                                             />
                                                             <span className="suggestion-name">{product.name}</span>
@@ -203,7 +203,7 @@ function Header() {
                                                     }
                                                     return userAvatar ? (
                                                         <img
-                                                            src={user.avatar || `http://localhost:3001/${userAvatar}`}
+                                                            src={user.avatar || `http://localhost:8000/${userAvatar}`}
                                                             alt="Avatar"
                                                             className="user-avatar"
                                                         />
