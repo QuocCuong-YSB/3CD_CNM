@@ -19,7 +19,7 @@ function ProductDetail() {
     const { id } = useParams();
     const [input, SetInput] = useState({});
     const [quantity, SetQuantity] = useState(1);
-    const [selectedImg, SetselectedImg] = useState();
+    const [selectedImg, SetselectedImg] = useState([]);
     const dispatch = useDispatch();
 
     const [reviews, setReviews] = useState([]);
@@ -50,6 +50,8 @@ function ProductDetail() {
             .get('/product/' + id + '/reviews')
             .then((res) => {
                 const data = Array.isArray(res.data.data) ? res.data.data : [];
+                console.log(data);
+
                 setReviews(data);
                 setFilteredReviews(data);
             })

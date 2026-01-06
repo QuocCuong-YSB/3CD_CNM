@@ -41,7 +41,7 @@ root.render(
             }}
         >
             <BrowserRouter>
-                <GoogleOAuthProvider clientId="210374019870-qq0de2q04e5cj5tjmbc5v8qg0nrlob0d.apps.googleusercontent.com">
+                <GoogleOAuthProvider clientId="863364360698-gaoeh93o8u2f7s5tr2tnveqg5qb7smrp.apps.googleusercontent.com">
                     <App>
                         <Routes>
                             <Route path="/admin/register" element={<RegisterTest />} />
