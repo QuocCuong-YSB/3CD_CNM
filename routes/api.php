@@ -29,7 +29,7 @@ Route::get('/member/brand', [BrandController::class, 'index']);
 Route::get('/member/sidebar-data', [CategoryController::class, 'getSidebarData']);
 Route::get('/member/product', [ProductController::class, 'index']);
 Route::get('/member/product/show/{id}', [ProductController::class, 'show']);
-Route::get('/product/search', [ProductController::class, 'search']);
+Route::get('/member/search/product', [ProductController::class, 'search']);
 Route::post('/login/google', [AuthController::class, 'loginWithGoogle']);
 
 Route::get('/products/{id}/reviews', [ReviewController::class, 'getByProduct']);
