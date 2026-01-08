@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreateReviewsTable extends Migration
 {
     public function up()
     {
@@ -13,15 +13,14 @@ return new class extends Migration
 
             $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->string('order_code');
+            $table->string('order_code')->nullable();
             $table->foreign('order_code')->references('order_code')->on('histories')->cascadeOnDelete();
 
             $table->tinyInteger('rating'); // 1-5
             $table->text('comment');
             $table->timestamps();
 
-            $table->unique(['id_user', 'id_product']);
-            $table->foreign('order_code')->references('order_code')->on('histories')->cascadeOnDelete();
+            $table->unique(['user_id', 'product_id']);
         });
     }
 

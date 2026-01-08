@@ -3,58 +3,33 @@
 namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
+use App\Models\History;
 use App\Models\Order;
 use App\Models\Review;
 use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request, $id)
     {
         $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'order_id' => 'required|exists:orders,id',
             'rating' => 'required|integer|min:1|max:5',
             'comment' => 'required|string',
         ]);
 
         $userId = $request->user()->id;
 
-        $order = Order::where('id', $request->order_id)
-            ->where('user_id', $userId)
-            ->where('status', 'delivered')
-            ->first();
-
-        if (!$order) {
-            return response()->json([
-                'message' => 'Bạn chưa mua hoặc đơn hàng chưa hoàn thành',
-            ], 403);
-        }
-
-        $hasProduct = $order->orderItems()
-            ->where('product_id', $request->product_id)
-            ->exists();
-
-        if (!$hasProduct) {
-            return response()->json([
-                'message' => 'Sản phẩm không nằm trong đơn hàng',
-            ], 403);
-        }
-
         $exists = Review::where('user_id', $userId)
-            ->where('product_id', $request->product_id)
+            ->where('product_id', $id)
             ->exists();
 
         if ($exists) {
-            return response()->json([
-                'message' => 'Bạn đã đánh giá sản phẩm này rồi',
-            ], 409);
+            return response()->json(['message' => 'Bạn đã đánh giá sản phẩm này rồi'], 409);
         }
 
-        $review = Review::addReview([
+        $review = Review::create([
             'user_id' => $userId,
-            'product_id' => $request->product_id,
-            'order_id' => $order->id,
+            'product_id' => $id,
             'rating' => $request->rating,
             'comment' => $request->comment,
         ]);
@@ -64,6 +39,7 @@ class ReviewController extends Controller
             'data' => $review,
         ], 201);
     }
+
 
     public function getByProduct($productId)
     {
