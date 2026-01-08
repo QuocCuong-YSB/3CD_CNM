@@ -11,12 +11,13 @@ class CartController extends Controller
 {
     public function index(Request $request)
     {
-        $carts = Cart::ofUser($request->user()->id)
+        $carts = Cart::where('user_id', $request->user()->id)
             ->with('product')
             ->get();
 
         return response()->json([
-            'success' => true,
+            'status' => true,
+            'message' => 'Cart retrieved successfully',
             'data' => $carts
         ], 200);
     }
@@ -31,9 +32,9 @@ class CartController extends Controller
         $userId = $request->user()->id;
         $product = Product::findOrFail($request->product_id);
 
-        if ($request->quantity > $product->stock) {
+        if ($request->quantity > $product->quantity) {
             return response()->json([
-                'message' => 'Out of stock!',
+                'message' => 'Out of stock!'
             ], 400);
         }
 
@@ -42,73 +43,105 @@ class CartController extends Controller
             ->first();
 
         if ($cart) {
-            $newQuantity = $cart->quantity + $request->quantity;
+            $cart->quantity += $request->quantity; 
+        } else {
+            $cart = new Cart([
+                'user_id' => $userId,
+                'product_id' => $product->id,
+                'quantity' => $request->quantity,
+                'price' => $product->price
+            ]);
+        }
 
-            if ($newQuantity > $product->stock) {
+        $cart->save();
+
+        $product->quantity -= $request->quantity;
+        $product->save();
+
+        $cart->load('product'); 
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Product added to cart successfully',
+            'data' => $cart
+        ], 200);
+    }
+
+    public function update(Request $request, $product_id)
+    {
+        $request->validate([
+            'quantity' => 'required|integer',
+        ]);
+
+        $userId = $request->user()->id;
+        $product = Product::findOrFail($product_id);
+
+        $cart = Cart::where('user_id', $userId)
+            ->where('product_id', $product_id)
+            ->firstOrFail();
+
+        $changeQuantity = $request->quantity; 
+
+        if ($changeQuantity > 0) {
+
+            if ($changeQuantity > $product->quantity) {
                 return response()->json([
-                    'message' => 'Out of stock!',
+                    'message' => 'Not enough stock to increase quantity'
                 ], 400);
             }
 
-            $cart->update([
-                'quantity' => $newQuantity
-            ]);
+            $cart->quantity += $changeQuantity;
+            $product->quantity -= $changeQuantity; 
+        } else
+
+        if ($changeQuantity < 0) {
+            $decreaseAmount = abs($changeQuantity);
+            if ($decreaseAmount > $cart->quantity) {
+                return response()->json([
+                    'message' => 'Cannot reduce quantity below 0'
+                ], 400);
+            }
+
+            $cart->quantity -= $decreaseAmount;
+            $product->quantity += $decreaseAmount; 
         } else {
-            $cart = Cart::create([
-                'user_id'    => $userId,
-                'product_id' => $product->id,
-                'quantity'   => $request->quantity,
-            ]);
-        }
-
-        return response()->json([
-            'message' => 'Product added to cart successfully',
-            'data'    => $cart->load('product'),
-        ], 200);
-    }
-
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'quantity' => 'required|integer|min:1',
-        ]);
-
-        $cart = Cart::ofUser($request->user()->id)
-            ->with('product')
-            ->findOrFail($id);
-
-        if ($request->quantity > $cart->product->stock) {
             return response()->json([
-                'message' => 'Out of stock!',
+                'message' => 'No change in quantity'
             ], 400);
         }
 
-        $cart->update([
-            'quantity' => $request->quantity,
-        ]);
+        $cart->save();
+        $product->save();
+        $cart->load('product');
 
         return response()->json([
+            'status' => true,
             'message' => 'Cart updated successfully',
-            'data'    => $cart,
+            'data' => $cart
         ], 200);
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, $product_id)
     {
-        $cart = Cart::ofUser($request->user()->id)->findOrFail($id);
+        $cart = Cart::where('user_id', $request->user()->id)
+            ->where('product_id', $product_id)
+            ->firstOrFail();
+
         $cart->delete();
 
         return response()->json([
-            'message' => 'Item removed from cart successfully',
+            'status' => true,
+            'message' => 'Product removed from cart'
         ], 200);
     }
 
     public function clear(Request $request)
     {
-        Cart::ofUser($request->user()->id)->delete();
+        Cart::where('user_id', $request->user()->id)->delete();
 
         return response()->json([
-            'message' => 'Cart cleared successfully',
+            'status' => true,
+            'message' => 'Cart cleared successfully'
         ], 200);
     }
 }

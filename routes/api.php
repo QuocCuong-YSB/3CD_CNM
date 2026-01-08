@@ -25,9 +25,7 @@ Route::post('/resend', [AuthController::class, 'resendCode']);
 Route::get('/member/country', [CountryController::class, 'index']);
 Route::get('/product/search', [ProductController::class, 'search']);
 Route::post('/login/google', [AuthController::class, 'loginWithGoogle']);
-
-Route::get('/products/{id}/reviews', [ReviewController::class, 'getByProduct']);
-
+Route::get('/product/{id}/reviews', [ReviewController::class, 'getByProduct']);
 
 Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:1'])->prefix('admin')->group(function () {
     
@@ -76,8 +74,8 @@ Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:0'])->prefix
     // Member Carts
     Route::get('/cart', [CartController::class, 'index']);
     Route::post('/cart', [CartController::class, 'store']);
-    Route::put('/cart/{id}', [CartController::class, 'update']);
-    Route::delete('/cart/{id}', [CartController::class, 'destroy']);
+    Route::put('/cart/product/{product_id}', [CartController::class, 'update']);
+    Route::delete('/cart/product/{product_id}', [CartController::class, 'destroy']);
     Route::delete('/cart', [CartController::class, 'clear']);
 
     Route::get('/user', [MemberMemberController::class, 'getProfile']);

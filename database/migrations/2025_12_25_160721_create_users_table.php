@@ -24,7 +24,7 @@ class CreateUsersTable extends Migration
 
             $table->foreignId('id_country')->constrained('countries');
 
-            $table->string('avatar');
+            $table->string('avatar')->nullable();
             $table->integer('level')->default(0);
 
             $table->timestamps();

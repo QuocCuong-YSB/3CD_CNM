@@ -16,11 +16,10 @@ class CreateReviewsTable extends Migration
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('id_product')->constrained('products')->cascadeOnDelete();
-
-            $table->foreignId('id_user')->constrained('users')->cascadeOnDelete();
-
-            $table->foreignId('order_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->string('order_code');
+            $table->foreign('order_code')->references('order_code')->on('histories')->cascadeOnDelete();
 
             $table->tinyInteger('rating'); // 1-5
             $table->text('comment');
@@ -29,6 +28,7 @@ class CreateReviewsTable extends Migration
             $table->unique(['user_id', 'product_id']);
         });
     }
+
 
     /**
      * Reverse the migrations.
