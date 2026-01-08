@@ -31,39 +31,21 @@ class CartController extends Controller
         $userId = $request->user()->id;
         $product = Product::findOrFail($request->product_id);
 
-        if ($request->quantity > $product->stock) {
-            return response()->json([
-                'message' => 'Out of stock!',
-            ], 400);
+        $cart = Cart::firstOrCreate(
+            ['user_id' => $userId, 'product_id' => $product->id],
+            ['quantity' => $request->quantity] 
+        );
+
+        if (!$cart->wasRecentlyCreated) {
+            $cart->quantity += $request->quantity;
+            $cart->save();
         }
 
-        $cart = Cart::where('user_id', $userId)
-            ->where('product_id', $product->id)
-            ->first();
-
-        if ($cart) {
-            $newQuantity = $cart->quantity + $request->quantity;
-
-            if ($newQuantity > $product->stock) {
-                return response()->json([
-                    'message' => 'Out of stock!',
-                ], 400);
-            }
-
-            $cart->update([
-                'quantity' => $newQuantity
-            ]);
-        } else {
-            $cart = Cart::create([
-                'user_id'    => $userId,
-                'product_id' => $product->id,
-                'quantity'   => $request->quantity,
-            ]);
-        }
+        $cart->load('product');
 
         return response()->json([
             'message' => 'Product added to cart successfully',
-            'data'    => $cart->load('product'),
+            'data' => $cart
         ], 200);
     }
 
