@@ -48,8 +48,7 @@ class CartController extends Controller
             $cart = new Cart([
                 'user_id' => $userId,
                 'product_id' => $product->id,
-                'quantity' => $request->quantity,
-                'price' => $product->price
+                'quantity' => $request->quantity
             ]);
         }
 
@@ -58,7 +57,8 @@ class CartController extends Controller
         $product->quantity -= $request->quantity;
         $product->save();
 
-        $cart->load('product'); 
+        $cart->load('product');
+        $cart->product->price;
 
         return response()->json([
             'status' => true,

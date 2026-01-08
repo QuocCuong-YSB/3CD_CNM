@@ -31,7 +31,7 @@ Route::get('/member/product', [ProductController::class, 'index']);
 Route::get('/member/product/show/{id}', [ProductController::class, 'show']);
 Route::get('/member/search/product', [ProductController::class, 'search']);
 Route::post('/login/google', [AuthController::class, 'loginWithGoogle']);
-Route::get('/product/{id}/reviews', [ReviewController::class, 'getByProduct']);
+Route::get('/member/product/{id}/reviews', [ReviewController::class, 'getByProduct']);
 
 Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:1'])->prefix('admin')->group(function () {
 
@@ -90,7 +90,7 @@ Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:0'])->prefix
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // Review Products
-    Route::post('/review', [ReviewController::class, 'store']);
+    Route::post('/product/{id}/reviews', [ReviewController::class, 'store']);
 });
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/send-message', [ChatController::class, 'send']);
