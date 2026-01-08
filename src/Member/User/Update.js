@@ -41,6 +41,19 @@ function UpdateMember() {
     function getDataUser() {
         apiMember.get('/user').then((res) => {
             let user = res.data.data;
+            let avatarData = [];
+
+            if (user.avatar) {
+                try {
+                    avatarData = JSON.parse(user.avatar);
+                    if (!Array.isArray(avatarData)) {
+                        avatarData = [user.avatar];
+                    }
+                } catch (e) {
+                    avatarData = [user.avatar];
+                }
+            }
+
             SetInput({
                 email: user.email,
                 name: user.name,
@@ -48,8 +61,8 @@ function UpdateMember() {
                 phone: user.phone,
                 address: user.address,
                 country: user.id_country,
-                avatar: JSON.parse(user.avatar),
-                avatar_render: JSON.parse(user.avatar),
+                avatar: avatarData,
+                avatar_render: avatarData,
             });
         });
     }
@@ -60,9 +73,10 @@ function UpdateMember() {
     }
     function renderImage() {
         return input.avatar_render.map((value, index) => {
+            const imgSrc = value.startsWith('http') ? value : `http://localhost:8000/${value}`;
             return (
                 <div key={index} className="avatar_list">
-                    <img src={`http://localhost:8000/${value}`}></img>
+                    <img src={imgSrc} alt="avatar"></img>
                 </div>
             );
         });

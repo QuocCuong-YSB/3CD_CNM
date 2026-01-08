@@ -20,6 +20,11 @@ const HeaderAdmin = () => {
         if (!user || !user.avatar) {
             return 'http://localhost:8000/no-image.png';
         }
+
+        if (typeof user.avatar === 'string' && user.avatar.startsWith('http')) {
+            return user.avatar;
+        }
+
         try {
             const avatar = typeof user.avatar === 'string' ? JSON.parse(user.avatar) : user.avatar;
             if (Array.isArray(avatar) && avatar.length > 0) {

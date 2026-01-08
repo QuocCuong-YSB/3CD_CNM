@@ -193,17 +193,29 @@ function Header() {
                                             <a href="#" onClick={() => Account()}>
                                                 {(() => {
                                                     let userAvatar = null;
+                                                    let isExternal = false;
                                                     if (user.avatar) {
-                                                        try {
-                                                            const avatars = JSON.parse(user.avatar);
-                                                            if (Array.isArray(avatars) && avatars.length > 0) {
-                                                                userAvatar = avatars[0];
+                                                        if (user.avatar.startsWith('http')) {
+                                                            userAvatar = user.avatar;
+                                                            isExternal = true;
+                                                        } else {
+                                                            try {
+                                                                const avatars = JSON.parse(user.avatar);
+                                                                if (Array.isArray(avatars) && avatars.length > 0) {
+                                                                    userAvatar = avatars[0];
+                                                                }
+                                                            } catch (e) {
+                                                                userAvatar = user.avatar;
                                                             }
-                                                        } catch (e) {}
+                                                        }
                                                     }
                                                     return userAvatar ? (
                                                         <img
-                                                            src={user.avatar || `http://localhost:8000/${userAvatar}`}
+                                                            src={
+                                                                isExternal
+                                                                    ? userAvatar
+                                                                    : `http://localhost:8000/${userAvatar}`
+                                                            }
                                                             alt="Avatar"
                                                             className="user-avatar"
                                                         />
