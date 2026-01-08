@@ -4,20 +4,18 @@ namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Order;
+use App\Models\History;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
-    /**
-     * Get orders
-     */
+    // Lấy danh sách đơn hàng cho Member (History)
     public function index(Request $request)
     {
         $userId = $request->user()->id;
-        $orders = Order::with('items.product')
-            ->where('user_id', $userId)
+        $orders = History::with('product')
+            ->where('id_user', $userId)
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -26,34 +24,33 @@ class OrderController extends Controller
         ]);
     }
 
-    /**
-     * Cancel order
-     */
+    // Hủy đơn hàng (Chỉ khi status = 0 - Chờ xác nhận)
     public function cancel(Request $request, $id)
     {
-        $order = Order::where('user_id', $request->user()->id)
-            ->where('id', $id)
-            ->first();
+        $userId = $request->user()->id;
+        $order = History::where('id_user', $userId)->where('id', $id)->first();
 
         if (!$order) {
             return response()->json(['error' => 'Đơn hàng không tồn tại.'], 404);
         }
 
         if ($order->status !== 0) {
-            return response()->json(['error' => 'Chỉ có thể hủy đơn hàng đang ở trạng thái chờ xác nhận.'], 400);
+            return response()->json(['error' => 'Đơn hàng không ở trạng thái có thể hủy.'], 400);
         }
 
         DB::beginTransaction();
         try {
-            $order->status = 3;
-            $order->save();
+            // Hủy toàn bộ item có cùng mã đơn hàng
+            History::where('order_code', $order->order_code)
+                ->update(['status' => 3]);
 
-            foreach ($order->items as $item) {
+            // Hoàn tồn kho
+            $items = History::where('order_code', $order->order_code)->get();
+            foreach ($items as $item) {
                 $product = $item->product;
                 if ($product) {
-                    $product->quantity += $item->quantity;
-                    $product->quantity_sold -= $item->quantity;
-                    $product->save();
+                    $product->increment('quantity', $item->quantity);
+                    $product->decrement('quantity_sold', $item->quantity);
                 }
             }
 
@@ -61,27 +58,23 @@ class OrderController extends Controller
             return response()->json(['message' => 'Hủy đơn hàng thành công!']);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => 'Lỗi khi hủy đơn hàng.'], 500);
+            return response()->json(['error' => 'Lỗi hệ thống khi hủy đơn hàng.'], 500);
         }
     }
 
+    // Xác nhận đã nhận hàng (Member)
     public function markAsDelivered(Request $request, $id)
     {
-        $order = Order::where('user_id', $request->user()->id)
-            ->where('id', $id)
-            ->first();
+        $userId = $request->user()->id;
+        $order = History::where('id_user', $userId)->where('id', $id)->first();
 
-        if (!$order) {
-            return response()->json(['error' => 'Đơn hàng không tồn tại.'], 404);
+        if (!$order || $order->status !== 1) {
+            return response()->json(['error' => 'Đơn hàng không hợp lệ.'], 400);
         }
 
-        if ($order->status !== 1) {
-            return response()->json(['error' => 'Đơn hàng phải ở trạng thái đang giao mới có thể xác nhận.'], 400);
-        }
+        History::where('order_code', $order->order_code)->update(['status' => 2]);
 
-        $order->status = 2;
-        $order->save();
-
-        return response()->json(['message' => 'Xác nhận nhận hàng thành công!']);
+        return response()->json(['message' => 'Xác nhận đã nhận hàng thành công!']);
     }
 }
+
