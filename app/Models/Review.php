@@ -9,7 +9,7 @@ class Review extends Model
     protected $fillable = [
         'user_id',
         'product_id',
-        'order_id',
+        'order_code',
         'rating',
         'comment',
     ];
@@ -30,7 +30,7 @@ class Review extends Model
 
     public function order()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(History::class);
     }
 
     public static function addReview(array $data)
