@@ -103,21 +103,33 @@ function HomeList() {
         setVisibleCount((prev) => prev + 12);
     };
 
-    function AddCart(product) {
-        const user = localStorage.getItem('user');
-        if (user) {
-            const stock = product.quantity;
-            if (stock <= 0) {
-                toast.error('Sản phẩm này đã hết hàng');
-                return;
-            }
+    async function AddCart(product) {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            toast.warn('Vui lòng đăng nhập');
+            return;
+        }
+
+        if (product.quantity <= 0) {
+            toast.error('Sản phẩm này đã hết hàng');
+            return;
+        }
+
+        try {
+            await apiMember.post('/cart', {
+                product_id: product.id,
+                quantity: 1
+            });
 
             dispath(addQuantityCart(product.id));
+
             toast.success('Thêm sản phẩm vào giỏ hàng thành công');
-        } else {
-            toast.warn('Vui lòng đăng nhập');
+        } catch (err) {
+            console.error(err.response?.data || err.message);
+            toast.error('Thêm sản phẩm vào giỏ thất bại');
         }
     }
+
 
     function renderData() {
         if (!Array.isArray(input)) return null;
