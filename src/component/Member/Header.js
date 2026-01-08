@@ -16,7 +16,7 @@ function Header() {
 
     useEffect(() => {
         apiMember
-            .get('/admin/category')
+            .get('/category')
             .then((res) => {
                 if (Array.isArray(res.data.data)) {
                     setCategories(res.data.data);
@@ -248,22 +248,18 @@ function Header() {
                                     <span className="icon-bar" />
                                 </button>
                             </div>
-                         <div className="mainmenu collapse navbar-collapse">
-    <ul className="nav navbar-nav">
-        <li>
-            <Link to="/member/home">Trang chủ</Link>
-        </li>
-
-        {categories.slice(0, 5).map((category) => (
-            <li key={category._id}>
-                <Link to={`/admin/category/${category._id}`}>
-                    {category.name}
-                </Link>
-            </li>
-        ))}
-    </ul>
-</div>
-
+                            <div className="mainmenu collapse navbar-collapse">
+                                <ul className="nav navbar-nav">
+                                    <li>
+                                        <Link to="/member/home">Trang chủ</Link>
+                                    </li>
+                                    {categories.slice(0, 5).map((category) => (
+                                        <li key={category.id}>
+                                            <Link to={`/member/category/${category.id}`}>{category.name}</Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>

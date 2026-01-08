@@ -81,7 +81,7 @@ function CheckOut() {
     useEffect(() => {
         const fetchCart = async () => {
             try {
-                const res = await apiMember.post('/cart', cart);
+                const res = await apiMember.get('/cart', cart);
                 const products = Array.isArray(res.data.data) ? res.data.data : [];
                 SetInputProducts(products);
 

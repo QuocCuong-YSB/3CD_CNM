@@ -124,12 +124,9 @@ function HomeList() {
         const currentItems = input.slice(0, visibleCount);
 
         return currentItems.map((value, index) => {
-            let avatar = [];
-            try {
-                avatar = typeof value.image === 'string' ? JSON.parse(value.image) : value.image;
-            } catch (e) {
-                avatar = Array.isArray(value.image) ? value.image : [value.image];
-            }
+            const avatar = Array.isArray(value.image) && value.image.length > 0 
+                ? value.image 
+                : ['default.png']; 
 
             const is_on_sale = value.sale > 0;
             const original_price = value.price;
@@ -143,7 +140,11 @@ function HomeList() {
 
                         <Link to={`/member/home/product/detail/${value.id}`}>
                             <div className="product-image">
-                                <img src={`http://localhost:8000/${avatar[0]}`} alt={value.name} />
+                                <img 
+                                    src={`http://localhost:8000/${avatar[0]}`} 
+                                    alt={value.name || 'Product'} 
+                                    onError={(e) => { e.target.src = '/images/default.png'; }}
+                                />
                             </div>
                         </Link>
 
@@ -179,61 +180,68 @@ function HomeList() {
     }
 
     function renderHeroSlider() {
-        if (!Array.isArray(sliderProducts)) return null;
+    if (!Array.isArray(sliderProducts)) return null;
 
-        const saleProducts = sliderProducts
-            .filter((p) => p.sale > 0)
-            .sort((a, b) => b.sale - a.sale)
-            .slice(0, 6);
+    const saleProducts = sliderProducts
+        .filter((p) => p.sale > 0)
+        .sort((a, b) => b.sale - a.sale)
+        .slice(0, 6);
 
-        if (saleProducts.length === 0) return null;
+    if (saleProducts.length === 0) return null;
 
-        return (
-            <div className="hero-slider-container">
-                {saleProducts.map((value, index) => {
-                    let avatar = [];
-                    try {
-                        avatar = typeof value.image === 'string' ? JSON.parse(value.image) : value.image;
-                    } catch (e) {
-                        avatar = Array.isArray(value.image) ? value.image : [value.image];
-                    }
-                    const is_on_sale = value.sale > 0;
-                    const original_price = value.price;
-                    const sale_percent = value.sale;
-                    const new_price = original_price * (1 - sale_percent / 100);
+    return (
+        <div className="hero-slider-container">
+            {saleProducts.map((value, index) => {
 
-                    let positionClass = 'card-hidden';
-                    const diff = (index - sliderIndex + 6) % 6;
+                const avatar = Array.isArray(value.image) && value.image.length > 0
+                    ? value.image
+                    : ['default.png'];
 
-                    if (diff === 0) positionClass = 'card-center';
-                    else if (diff === 1) positionClass = 'card-right';
-                    else if (diff === 2) positionClass = 'card-far-right';
-                    else if (diff === 5) positionClass = 'card-left';
-                    else if (diff === 4) positionClass = 'card-far-left';
+                const is_on_sale = value.sale > 0;
+                const original_price = value.price || 0;
+                const sale_percent = value.sale || 0;
+                const new_price = is_on_sale 
+                    ? original_price * (1 - sale_percent / 100) 
+                    : original_price;
 
-                    return (
-                        <div className={`hero-product-card ${positionClass}`} key={index}>
-                            <div className="sale-badge">-{sale_percent}%</div>
-                            <Link to={`/member/home/product/detail/${value.id}`}>
-                                <div className="product-image">
-                                    <img src={`http://localhost:8000/${avatar[0]}`} alt={value.name} />
-                                </div>
+                let positionClass = 'card-hidden';
+                const diff = (index - sliderIndex + 6) % 6;
+
+                if (diff === 0) positionClass = 'card-center';
+                else if (diff === 1) positionClass = 'card-right';
+                else if (diff === 2) positionClass = 'card-far-right';
+                else if (diff === 5) positionClass = 'card-left';
+                else if (diff === 4) positionClass = 'card-far-left';
+
+                return (
+                    <div className={`hero-product-card ${positionClass}`} key={index}>
+                        {is_on_sale && <div className="sale-badge">-{sale_percent}%</div>}
+
+                        <Link to={`/member/home/product/detail/${value.id}`}>
+                            <div className="product-image">
+                                <img
+                                    src={`http://localhost:8000/${avatar[0]}`}
+                                    alt={value.name || 'Product'}
+                                    onError={(e) => { e.target.src = '/images/default.png'; }}
+                                />
+                            </div>
+                        </Link>
+
+                        <div className="product-info">
+                            <Link to={`/member/home/product/detail/${value.id}`} className="product-name">
+                                {value.name || 'Unknown Product'}
                             </Link>
-                            <div className="product-info">
-                                <Link to={`/member/home/product/detail/${value.id}`} className="product-name">
-                                    {value.name}
-                                </Link>
-                                <div className="price-container">
-                                    <span className="price-new">{formatPrice(new_price)}</span>
-                                    <span className="price-old">{formatPrice(original_price)}</span>
-                                </div>
+                            <div className="price-container">
+                                <span className="price-new">{formatPrice(new_price)}</span>
+                                <span className="price-old">{formatPrice(original_price)}</span>
                             </div>
                         </div>
-                    );
-                })}
-            </div>
-        );
-    }
+                    </div>
+                );
+            })}
+        </div>
+    );
+}
 
     return (
         <div>
