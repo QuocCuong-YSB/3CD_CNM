@@ -10,7 +10,7 @@ function LeftSide() {
         minPrice: '',
         maxPrice: '',
         brand: '',
-        category: ''
+        category: '',
     });
     const [msg, setMsg] = useState('');
     const [maxDbPrice, setMaxDbPrice] = useState(0);
@@ -21,35 +21,21 @@ function LeftSide() {
             minPrice: '',
             maxPrice: '',
             brand: '',
-            category: ''
+            category: '',
         });
         setMsg('');
     }, [location.pathname]);
 
     useEffect(() => {
-        apiMember.get('/category')
-            .then(res => {
-                if(Array.isArray(res.data.data)) setCategories(res.data.data);
+        apiMember
+            .get('/sidebar-data')
+            .then((res) => {
+                const { categories, brands, maxPrice } = res.data.data;
+                setCategories(categories || []);
+                setBrands(brands || []);
+                setMaxDbPrice(maxPrice || 0);
             })
-            .catch(err => console.error(err));
-
-        apiMember.get('/brand')
-            .then(res => {
-                if(Array.isArray(res.data.data)) setBrands(res.data.data);
-            })
-            .catch(err => console.error(err));
-
-        apiMember.get('/product')
-            .then(res => {
-                if(Array.isArray(res.data.data)) {
-                     const products = res.data.data;
-                     if(products.length > 0) {
-                         const max = Math.max(...products.map(p => p.price));
-                         setMaxDbPrice(max);
-                     }
-                }
-            })
-            .catch(err => console.error(err));
+            .catch((err) => console.error('Error fetching sidebar data:', err));
     }, []);
 
     const handleFilterSubmit = () => {
@@ -69,22 +55,28 @@ function LeftSide() {
             setMsg('Không thể nhập giá âm!');
             return;
         }
-        
+
         if (min > max) {
             setMsg('Giá "Từ" phải nhỏ hơn hoặc bằng giá "Đến"!');
             return;
         }
-        
+
         if (min > maxDbPrice) {
-             setMsg(`Giá nhập vào (${min.toLocaleString('vi-VN')}đ) vượt quá giá sản phẩm cao nhất hiện có (${maxDbPrice.toLocaleString('vi-VN')}đ). Không có sản phẩm nào.`);
+            setMsg(
+                `Giá nhập vào (${min.toLocaleString(
+                    'vi-VN',
+                )}đ) vượt quá giá sản phẩm cao nhất hiện có (${maxDbPrice.toLocaleString(
+                    'vi-VN',
+                )}đ). Không có sản phẩm nào.`,
+            );
         } else {
-             setMsg('Đã áp dụng bộ lọc thành công!');
-             setTimeout(() => setMsg(''), 3000);
+            setMsg('Đã áp dụng bộ lọc thành công!');
+            setTimeout(() => setMsg(''), 3000);
         }
 
         const event = new CustomEvent('product-filter', { detail: filters });
         window.dispatchEvent(event);
-    }
+    };
 
     const handleReset = () => {
         const resetFilters = { minPrice: '', maxPrice: '', brand: '', category: '' };
@@ -92,45 +84,45 @@ function LeftSide() {
         setMsg('');
         const event = new CustomEvent('product-filter', { detail: resetFilters });
         window.dispatchEvent(event);
-    }
-    
+    };
+
     // 5000000 -> 5.000.000
     const formatNumber = (num) => {
         if (!num && num !== 0) return '';
-        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     };
 
     // 5.000.000 -> 5000000
     const parseNumber = (str) => {
         if (!str) return '';
-        return str.toString().replace(/\./g, "");
+        return str.toString().replace(/\./g, '');
     };
 
     const handlePriceChange = (e, source) => {
         const rawValue = parseNumber(e.target.value);
-        
+
         if (rawValue && !/^\d+$/.test(rawValue)) return;
 
         const val = rawValue ? parseInt(rawValue) : '';
-        
-        if(val && val < 0) {
-             setMsg('Cảnh báo: Không được nhập số âm');
+
+        if (val && val < 0) {
+            setMsg('Cảnh báo: Không được nhập số âm');
         } else {
-             if(msg.includes('số âm')) setMsg('');
+            if (msg.includes('số âm')) setMsg('');
         }
-        
-        setFilters(prev => ({ ...prev, [source]: val }));
+
+        setFilters((prev) => ({ ...prev, [source]: val }));
     };
 
     const handlePriceIncrement = (source, amount) => {
-        setFilters(prev => {
+        setFilters((prev) => {
             const current = prev[source] ? parseInt(prev[source]) : 0;
             const newVal = current + amount;
             if (newVal < 0) return prev;
             return { ...prev, [source]: newVal };
         });
-    }
-    
+    };
+
     const handleBrandClick = (id) => {
         const newFilters = { ...filters, brand: id };
         setFilters(newFilters);
@@ -149,7 +141,7 @@ function LeftSide() {
         <div className="col-sm-3">
             <div className="left-sidebar">
                 <h2>BỘ LỌC TÌM KIẾM</h2>
-                
+
                 {/* Price Range */}
                 <div className="panel-group category-products">
                     <div className="panel panel-default">
@@ -157,9 +149,16 @@ function LeftSide() {
                             <h4 className="panel-title">Chọn khoảng giá</h4>
                         </div>
                         <div className="panel-body price-filter-body">
-                           {msg && <div className="alert alert-info" style={{fontSize: '12px', padding: '5px', marginBottom: '10px'}}>{msg}</div>}
-                           
-                           <div className="form-group">
+                            {msg && (
+                                <div
+                                    className="alert alert-info"
+                                    style={{ fontSize: '12px', padding: '5px', marginBottom: '10px' }}
+                                >
+                                    {msg}
+                                </div>
+                            )}
+
+                            <div className="form-group">
                                 <label>Từ:</label>
                                 <div className="input-group-custom">
                                     <input
@@ -170,15 +169,25 @@ function LeftSide() {
                                         onChange={(e) => handlePriceChange(e, 'minPrice')}
                                     />
                                     <div className="spin-btns">
-                                        <button className="spin-up" onClick={() => handlePriceIncrement('minPrice', 500000)}><i className="fa fa-caret-up"></i></button>
-                                        <button className="spin-down" onClick={() => handlePriceIncrement('minPrice', -500000)}><i className="fa fa-caret-down"></i></button>
+                                        <button
+                                            className="spin-up"
+                                            onClick={() => handlePriceIncrement('minPrice', 500000)}
+                                        >
+                                            <i className="fa fa-caret-up"></i>
+                                        </button>
+                                        <button
+                                            className="spin-down"
+                                            onClick={() => handlePriceIncrement('minPrice', -500000)}
+                                        >
+                                            <i className="fa fa-caret-down"></i>
+                                        </button>
                                     </div>
                                 </div>
-                           </div>
-                           <div className="form-group">
+                            </div>
+                            <div className="form-group">
                                 <label>Đến:</label>
                                 <div className="input-group-custom">
-                                     <input
+                                    <input
                                         type="text"
                                         className="form-control"
                                         value={formatNumber(filters.maxPrice)}
@@ -186,37 +195,96 @@ function LeftSide() {
                                         onChange={(e) => handlePriceChange(e, 'maxPrice')}
                                     />
                                     <div className="spin-btns">
-                                        <button className="spin-up" onClick={() => handlePriceIncrement('maxPrice', 500000)}><i className="fa fa-caret-up"></i></button>
-                                        <button className="spin-down" onClick={() => handlePriceIncrement('maxPrice', -500000)}><i className="fa fa-caret-down"></i></button>
+                                        <button
+                                            className="spin-up"
+                                            onClick={() => handlePriceIncrement('maxPrice', 500000)}
+                                        >
+                                            <i className="fa fa-caret-up"></i>
+                                        </button>
+                                        <button
+                                            className="spin-down"
+                                            onClick={() => handlePriceIncrement('maxPrice', -500000)}
+                                        >
+                                            <i className="fa fa-caret-down"></i>
+                                        </button>
                                     </div>
                                 </div>
-                           </div>
-                           <div className="filter-buttons">
-                               <button className="btn btn-primary btn-filter" onClick={handleFilterSubmit}>
+                            </div>
+                            <div className="filter-buttons">
+                                <button className="btn btn-primary btn-filter" onClick={handleFilterSubmit}>
                                     Lọc
-                               </button>
-                               <button className="btn btn-reset" onClick={handleReset}>
+                                </button>
+                                <button className="btn btn-reset" onClick={handleReset}>
                                     Đặt lại
-                               </button>
-                           </div>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Brands */}
+                {/* Categories */}
                 <div className="brands_products">
+                    <h2>DANH MỤC</h2>
+                    <div className="brands-name">
+                        <ul className="nav nav-pills nav-stacked">
+                            <li>
+                                <a
+                                    href="#"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        handleCategoryClick('');
+                                    }}
+                                    className={filters.category === '' ? 'active-filter' : ''}
+                                >
+                                    Tất cả danh mục
+                                </a>
+                            </li>
+                            {categories.map((cat) => (
+                                <li key={cat.id}>
+                                    <a
+                                        href="#"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            handleCategoryClick(cat.id);
+                                        }}
+                                        className={filters.category === cat.id ? 'active-filter' : ''}
+                                    >
+                                        {cat.name}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+
+                {/* Brands */}
+                <div className="brands_products" style={{ marginTop: '20px' }}>
                     <h2>THƯƠNG HIỆU</h2>
                     <div className="brands-name">
                         <ul className="nav nav-pills nav-stacked">
                             <li>
-                                <a href="#" onClick={(e) => { e.preventDefault(); handleBrandClick('') }}>
-                                    <span className="pull-right"></span>Tất cả
+                                <a
+                                    href="#"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        handleBrandClick('');
+                                    }}
+                                    className={filters.brand === '' ? 'active-filter' : ''}
+                                >
+                                    Tất cả thương hiệu
                                 </a>
                             </li>
-                            {brands.map(brand => (
-                                <li key={brand._id} className={filters.brand === brand._id ? 'active' : ''}>
-                                    <a href="#" onClick={(e) => { e.preventDefault(); handleBrandClick(brand._id) }}>
-                                        <span className="pull-right"></span>{brand.name}
+                            {brands.map((brand) => (
+                                <li key={brand.id}>
+                                    <a
+                                        href="#"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            handleBrandClick(brand.id);
+                                        }}
+                                        className={filters.brand === brand.id ? 'active-filter' : ''}
+                                    >
+                                        {brand.name}
                                     </a>
                                 </li>
                             ))}

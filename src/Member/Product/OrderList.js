@@ -214,9 +214,9 @@ function OrderList() {
 
                         return (
                             <div key={idx} className="order-item">
-                                <img src={`http://localhost:3001/${image[0] || 'no-image.png'}`} alt={product.name} />
+                                <img src={`http://localhost:8000/${image[0] || 'no-image.png'}`} alt={product.name} />
                                 <div className="order-item-info">
-                                    <Link to={`/member/home/product/detail/${product._id}`}>
+                                    <Link to={`/member/home/product/detail/${product.id}`}>
                                         <h4>{product.name}</h4>
                                     </Link>
                                     <p>Số lượng: {item.quantity || item.qualty}</p>
@@ -248,13 +248,13 @@ function OrderList() {
                                 cursor: 'pointer',
                                 marginLeft: '10px',
                             }}
-                            onClick={() => handleCancelOrder(items[0]._id)}
+                            onClick={() => handleCancelOrder(items[0].id)}
                         >
                             Hủy đơn hàng
                         </button>
                     )}
                     {status === 1 && (
-                        <button className="btn-delivered" onClick={() => handleMarkAsDelivered(items[0]._id)}>
+                        <button className="btn-delivered" onClick={() => handleMarkAsDelivered(items[0].id)}>
                             Đã nhận hàng
                         </button>
                     )}
@@ -407,11 +407,11 @@ function OrderList() {
                                     return (
                                         <div key={idx} className="detail-product-item">
                                             <img
-                                                src={`http://localhost:3001/${image[0] || 'no-image.png'}`}
+                                                src={`http://localhost:8000/${image[0] || 'no-image.png'}`}
                                                 alt={product.name}
                                             />
                                             <div className="detail-product-info">
-                                                <Link to={`/member/home/product/detail/${product._id}`}>
+                                                <Link to={`/member/home/product/detail/${product.id}`}>
                                                     <h4>{product.name}</h4>
                                                 </Link>
                                                 <p>Giá: {formatPrice(item.price)}</p>

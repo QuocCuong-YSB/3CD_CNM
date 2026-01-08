@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import './App.css';
 import Header from './component/Member/Header';
 import { UserProvider } from './Context/MemberCartContext';
@@ -9,7 +10,26 @@ import { useLocation } from 'react-router-dom';
 import { ToastContainer, Bounce } from 'react-toastify';
 import LeftSideMyPD from './component/Member/LeftSideMyPD';
 import DefaultLayout from './Admin/Layouts/DefaultLayout';
+import ChatMember from './component/Member/Chat/ChatMember';
 function App(props) {
+    const [authInfo, setAuthInfo] = useState({
+        userId: localStorage.getItem('IdUser'),
+        token: localStorage.getItem('token'),
+    });
+
+    useEffect(() => {
+        const handleUserUpdated = () => {
+            setAuthInfo({
+                userId: localStorage.getItem('IdUser'),
+                token: localStorage.getItem('token'),
+            });
+        };
+
+        window.addEventListener('user-updated', handleUserUpdated);
+        return () => window.removeEventListener('user-updated', handleUserUpdated);
+    }, []);
+
+    const { userId, token } = authInfo;
     const location = useLocation();
     const path = location.pathname;
     const isCheckoutPage = path.includes('/checkout');
@@ -55,8 +75,10 @@ function App(props) {
                                     )}
                                 </div>
                             </div>
+
                             {<Footer />}
                         </div>
+                        <ChatMember userId={userId} token={token} userAdmin={2} />
                     </Provider>
                 </UserProvider>
             )}

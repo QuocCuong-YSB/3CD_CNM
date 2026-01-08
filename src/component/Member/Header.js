@@ -68,7 +68,7 @@ function Header() {
         setKeyword('');
         setSuggestions([]);
         dispath(setSearch(''));
-        navigate(`/member/home/product/detail/${product._id}`);
+        navigate(`/member/home/product/detail/${product.id}`);
     }
 
     const [user, setUser] = useState(localStorage.getItem('user'));
@@ -156,16 +156,16 @@ function Header() {
                                                 {suggestions.map((product) => {
                                                     let avatar = '';
                                                     try {
-                                                        avatar = JSON.parse(product.image)[0];
+                                                        avatar = product.image[0];
                                                     } catch (e) {}
 
                                                     return (
                                                         <li
-                                                            key={product._id}
+                                                            key={product.id}
                                                             onMouseDown={() => handleSuggestionClick(product)}
                                                         >
                                                             <img
-                                                                src={`http://localhost:3001/${avatar}`}
+                                                                src={`http://localhost:8000/${avatar}`}
                                                                 alt={product.name}
                                                             />
                                                             <span className="suggestion-name">{product.name}</span>
@@ -203,7 +203,7 @@ function Header() {
                                                     }
                                                     return userAvatar ? (
                                                         <img
-                                                            src={user.avatar || `http://localhost:3001/${userAvatar}`}
+                                                            src={user.avatar || `http://localhost:8000/${userAvatar}`}
                                                             alt="Avatar"
                                                             className="user-avatar"
                                                         />
@@ -248,18 +248,22 @@ function Header() {
                                     <span className="icon-bar" />
                                 </button>
                             </div>
-                            <div className="mainmenu collapse navbar-collapse">
-                                <ul className="nav navbar-nav">
-                                    <li>
-                                        <Link to="/member/home">Trang chủ</Link>
-                                    </li>
-                                    {categories.slice(0, 5).map((category) => (
-                                        <li key={category._id}>
-                                            <Link to={`/admin/category/${category._id}`}>{category.name}</Link>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
+                         <div className="mainmenu collapse navbar-collapse">
+    <ul className="nav navbar-nav">
+        <li>
+            <Link to="/member/home">Trang chủ</Link>
+        </li>
+
+        {categories.slice(0, 5).map((category) => (
+            <li key={category._id}>
+                <Link to={`/admin/category/${category._id}`}>
+                    {category.name}
+                </Link>
+            </li>
+        ))}
+    </ul>
+</div>
+
                         </div>
                     </div>
                 </div>

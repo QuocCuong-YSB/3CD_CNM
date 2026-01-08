@@ -85,9 +85,9 @@ function CartProduct() {
                 <tr key={index}>
                     <td className="cart_product" data-label="Sản Phẩm">
                         <div className="product-info">
-                            <img src={`http://localhost:3001/${avatar[0]}`} alt={value.name} />
+                            <img src={`http://localhost:8000/${avatar[0]}`} alt={value.name} />
                             <div>
-                                <Link to={`/member/home/product/detail/${value._id}`}>{value.name}</Link>
+                                <Link to={`/member/home/product/detail/${value.id}`}>{value.name}</Link>
                             </div>
                         </div>
                     </td>
@@ -107,14 +107,14 @@ function CartProduct() {
                         <div className="quantity-control">
                             <button
                                 className="quantity-btn"
-                                onClick={() => removeQuantityCartProduct(value._id, value.qty)}
+                                onClick={() => removeQuantityCartProduct(value.id, value.qty)}
                             >
                                 −
                             </button>
                             <input type="text" className="quantity-input" value={value.qty} readOnly />
                             <button
                                 className="quantity-btn"
-                                onClick={() => addQuantityCartProduct(value._id, value.qty)}
+                                onClick={() => addQuantityCartProduct(value.id, value.qty)}
                             >
                                 +
                             </button>
@@ -124,7 +124,7 @@ function CartProduct() {
                         <p className="cart_price">{formatPrice(new_price * value.qty)}</p>
                     </td>
                     <td className="cart_delete" data-label="Xóa">
-                        <a onClick={() => removeFromCartProduct(value._id, value.qty)}>
+                        <a onClick={() => removeFromCartProduct(value.id, value.qty)}>
                             <i className="fa fa-times" />
                         </a>
                     </td>

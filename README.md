@@ -10,14 +10,15 @@ Dự án Thương mại điện tử (E-Commerce) hoàn chỉnh được phát t
 
 ---
 
-## � Video Demo
+## Video Demo
 
 [![Xem Video Demo](https://img.youtube.com/vi/CgLrueBmr_4/0.jpg)](https://www.youtube.com/watch?v=CgLrueBmr_4)
+<br>
 _Nhấn vào ảnh để xem video demo thực hành các tính năng của dự án._
 
 ---
 
-## �🚀 Tính năng hệ thống
+## 🚀 Tính năng hệ thống
 
 ### 🛠 Backend (Node.js & MongoDB)
 

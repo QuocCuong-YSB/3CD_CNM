@@ -1,7 +1,7 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import styles from './Sidebar.module.scss';
 import classNames from 'classnames/bind';
-import { FaGlobeAsia, FaSignOutAlt, FaRegListAlt, FaShippingFast } from 'react-icons/fa';
+import { FaGlobeAsia, FaSignOutAlt, FaRegListAlt, FaShippingFast, FaEnvelope } from 'react-icons/fa';
 import { FaUsers } from 'react-icons/fa';
 import { TbCategoryFilled } from 'react-icons/tb';
 import { toast } from 'react-toastify';
@@ -72,6 +72,15 @@ const Sidebar = () => {
                     >
                         <FaGlobeAsia className={cx('icon')} />
                         <span>Thương hiệu</span>
+                    </NavLink>
+                </li>
+                <li className={cx('sidebar-menu-item')}>
+                    <NavLink
+                        to="/admin/messages"
+                        className={({ isActive }) => cx('sidebar-menu-link', { active: isActive })}
+                    >
+                        <FaEnvelope className={cx('icon')} />
+                        <span>Tin nhắn</span>
                     </NavLink>
                 </li>
                 <li className={cx('sidebar-menu-item')}>

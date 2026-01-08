@@ -53,7 +53,11 @@ function HomeList() {
             apiMember
                 .get(query)
                 .then((res) => {
-                    SetInput(Array.isArray(res.data.data) ? res.data.data : []);
+                    const data = Array.isArray(res.data.data) ? res.data.data : [];
+                    SetInput(data);
+                    if (!filters.name && !filters.brand && !filters.category && !filters.minPrice) {
+                        setSliderProducts(data);
+                    }
                 })
                 .catch((err) => {
                     console.error(err);
@@ -72,26 +76,28 @@ function HomeList() {
         } else if (categoryId) {
             fetchFilteredProducts({ category: categoryId });
         } else {
-            getAllProduct();
+            apiMember
+                .get('/product')
+                .then((res) => {
+                    const data = Array.isArray(res.data.data) ? res.data.data : [];
+                    SetInput(data);
+                    setSliderProducts(data);
+                })
+                .catch((err) => {
+                    console.log(err);
+                    SetInput([]);
+                });
         }
-
-        return () => {
-            window.removeEventListener('product-filter', handleFilterEvent);
-        };
-    }, [categoryId, search, location.pathname]);
-
-    useEffect(() => {
-        apiMember.get('/product').then((res) => {
-            if (Array.isArray(res.data.data)) {
-                setSliderProducts(res.data.data);
-            }
-        });
 
         const interval = setInterval(() => {
             setSliderIndex((prev) => (prev + 1) % 6);
         }, 3000);
-        return () => clearInterval(interval);
-    }, []);
+
+        return () => {
+            window.removeEventListener('product-filter', handleFilterEvent);
+            clearInterval(interval);
+        };
+    }, [categoryId, search, location.pathname]);
 
     const handleLoadMore = () => {
         setVisibleCount((prev) => prev + 12);
@@ -106,7 +112,7 @@ function HomeList() {
                 return;
             }
 
-            dispath(addQuantityCart(product._id));
+            dispath(addQuantityCart(product.id));
             toast.success('Thêm sản phẩm vào giỏ hàng thành công');
         } else {
             toast.warn('Vui lòng đăng nhập');
@@ -118,7 +124,12 @@ function HomeList() {
         const currentItems = input.slice(0, visibleCount);
 
         return currentItems.map((value, index) => {
-            const avatar = JSON.parse(value.image);
+            let avatar = [];
+            try {
+                avatar = typeof value.image === 'string' ? JSON.parse(value.image) : value.image;
+            } catch (e) {
+                avatar = Array.isArray(value.image) ? value.image : [value.image];
+            }
 
             const is_on_sale = value.sale > 0;
             const original_price = value.price;
@@ -130,7 +141,7 @@ function HomeList() {
                     <div className="product-card-new">
                         {is_on_sale && <div className="sale-badge">-{sale_percent}%</div>}
 
-                        <Link to={`/member/home/product/detail/${value._id}`}>
+                        <Link to={`/member/home/product/detail/${value.id}`}>
                             <div className="product-image">
                                 <img src={`http://localhost:8000/${avatar[0]}`} alt={value.name} />
                             </div>
@@ -138,7 +149,7 @@ function HomeList() {
 
                         <div className="product-info">
                             <div>
-                                <Link to={`/member/home/product/detail/${value._id}`} className="product-name">
+                                <Link to={`/member/home/product/detail/${value.id}`} className="product-name">
                                     {value.name}
                                 </Link>
 
@@ -180,7 +191,12 @@ function HomeList() {
         return (
             <div className="hero-slider-container">
                 {saleProducts.map((value, index) => {
-                    const avatar = JSON.parse(value.image);
+                    let avatar = [];
+                    try {
+                        avatar = typeof value.image === 'string' ? JSON.parse(value.image) : value.image;
+                    } catch (e) {
+                        avatar = Array.isArray(value.image) ? value.image : [value.image];
+                    }
                     const is_on_sale = value.sale > 0;
                     const original_price = value.price;
                     const sale_percent = value.sale;
@@ -198,13 +214,13 @@ function HomeList() {
                     return (
                         <div className={`hero-product-card ${positionClass}`} key={index}>
                             <div className="sale-badge">-{sale_percent}%</div>
-                            <Link to={`/member/home/product/detail/${value._id}`}>
+                            <Link to={`/member/home/product/detail/${value.id}`}>
                                 <div className="product-image">
-                                    <img src={`http://localhost:3001/${avatar[0]}`} alt={value.name} />
+                                    <img src={`http://localhost:8000/${avatar[0]}`} alt={value.name} />
                                 </div>
                             </Link>
                             <div className="product-info">
-                                <Link to={`/member/home/product/detail/${value._id}`} className="product-name">
+                                <Link to={`/member/home/product/detail/${value.id}`} className="product-name">
                                     {value.name}
                                 </Link>
                                 <div className="price-container">
