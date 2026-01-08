@@ -34,7 +34,7 @@ class DatabaseSeeder extends Seeder
         echo "✅ Categories seeded.\n";
 
         // 3. Seed Brands
-        $brands = ['Gertech', 'ROLER', 'Panasonic', 'Bosch', 'YAMATO', 'Chefs', 'Arber', 'Canzy'];
+        $brands = ['Bosch', 'Chefs', 'Arber', 'Canzy', 'YAMATO', 'Gertech', 'ROLER', 'Panasonic', 'Kocher'];
         foreach ($brands as $brand) {
             Brand::firstOrCreate(['name' => $brand]);
         }
@@ -50,7 +50,7 @@ class DatabaseSeeder extends Seeder
                 'phone' => '0123456789',
                 'address' => 'Hanoi, Vietnam',
                 'avatar' => json_encode(['avatars/default-admin.png']),
-                'level' => 0, // Admin
+                'level' => 1, // Admin
                 'is_active' => 1,
                 'id_country' => 1
             ]);
@@ -67,7 +67,7 @@ class DatabaseSeeder extends Seeder
                 'phone' => '0987654321',
                 'address' => 'HCM City, Vietnam',
                 'avatar' => json_encode(['avatars/default-user.png']),
-                'level' => 1, // Member
+                'level' => 0, // Member
                 'is_active' => 1,
                 'id_country' => 1
             ]);
@@ -80,74 +80,110 @@ class DatabaseSeeder extends Seeder
                 [
                     'id_category' => 1,
                     'id_brand' => 1,
-                    'name' => 'Samsung Refrigerator RT20',
-                    'image' => json_encode(['productImages/sample_fridge.png']),
-                    'price' => 7500000,
+                    'name' => 'Bếp ba từ Bosch PUC631BB2E',
+                    'image' => json_encode(['productImages/bep-ba-tu-bosch-puc631bb2e.jpg']),
+                    'price' => 13500000,
                     'status' => 1,
                     'sale' => 10,
-                    'detail' => 'High quality refrigerator with inverter technology.',
-                    'quantity' => 20,
+                    'detail' => '“Con cưng” của hãng Bosch, đỉnh cao về công nghệ, chất lượng.',
+                    'quantity' => 71,
                     'quantity_sold' => 5
                 ],
                 [
                     'id_category' => 1,
-                    'id_brand' => 2,
-                    'name' => 'LG Microwave Oven',
-                    'image' => json_encode(['productImages/sample_microwave.png']),
-                    'price' => 3200000,
+                    'id_brand' => 1,
+                    'name' => 'Bếp ba từ Bosch PUJ631BB2E',
+                    'image' => json_encode(['productImages/bep-ba-tu-bosch-puj631bb2e.png']),
+                    'price' => 14600000,
                     'status' => 1,
-                    'sale' => 0,
-                    'detail' => 'Quick and efficient cooking with multiple modes.',
+                    'sale' => 5,
+                    'detail' => 'Thiết kế cao cấp, vùng nấu rộng cho nồi cỡ lớn.',
                     'quantity' => 15,
                     'quantity_sold' => 2
                 ],
                 [
-                    'id_category' => 4,
-                    'id_brand' => 1,
-                    'name' => 'Samsung 4K Smart TV 55"',
-                    'image' => json_encode(['productImages/sample_tv.png']),
-                    'price' => 12000000,
+                    'id_category' => 1,
+                    'id_brand' => 2,
+                    'name' => 'Bếp ba từ Chefs EH-IH566',
+                    'image' => json_encode(['productImages/bep-ba-tu-chefs-eh-ih566.png']),
+                    'price' => 22000000,
                     'status' => 1,
                     'sale' => 15,
-                    'detail' => 'Ultra HD Smart TV with stunning colors.',
-                    'quantity' => 10,
+                    'detail' => 'Bếp từ ba EH-IH566 ứng dụng công nghệ Inverter thông minh vượt trội.',
+                    'quantity' => 29,
                     'quantity_sold' => 3
                 ],
                 [
-                    'id_category' => 4,
-                    'id_brand' => 7,
-                    'name' => 'MacBook Air M2',
-                    'image' => json_encode(['productImages/sample_macbook.png']),
-                    'price' => 28000000,
+                    'id_category' => 1,
+                    'id_brand' => 3,
+                    'name' => 'Bếp điện từ Arber AB 380',
+                    'image' => json_encode(['productImages/bep-dien-tu-arber-ab-380.jpg']),
+                    'price' => 8613000,
                     'status' => 1,
                     'sale' => 5,
-                    'detail' => 'Supercharged by M2 chip, thin and light.',
-                    'quantity' => 8,
+                    'detail' => 'Chế độ hẹn giờ độc lập cho từng bếp, báo động bằng âm thanh.',
+                    'quantity' => 58,
                     'quantity_sold' => 1
                 ],
                 [
-                    'id_category' => 2,
-                    'id_brand' => 8,
-                    'name' => 'Sony Bluetooth Speaker SRS-XB13',
-                    'image' => json_encode(['productImages/sample_speaker.png']),
-                    'price' => 1290000,
+                    'id_category' => 1,
+                    'id_brand' => 4,
+                    'name' => 'Bếp điện từ Canzy CZ-3002GS',
+                    'image' => json_encode(['productImages/bep-dien-tu-canzy-cz-3002gs.jpg']),
+                    'price' => 3990000,
                     'status' => 1,
                     'sale' => 20,
-                    'detail' => 'Compact and portable with deep bass.',
+                    'detail' => 'Điều khiển độc lập cho từng vùng nấu.',
                     'quantity' => 50,
                     'quantity_sold' => 12
                 ],
                 [
                     'id_category' => 1,
                     'id_brand' => 6,
-                    'name' => 'Xiaomi Mi Smart Air Fryer',
-                    'image' => json_encode(['productImages/sample_fryer.png']),
-                    'price' => 2100000,
+                    'name' => 'Bếp điện từ đôi YAMATO YMT-368',
+                    'image' => json_encode(['productImages/bep-dien-tu-doi-yamato-ymt-368.jpg']),
+                    'price' => 23500000,
                     'status' => 1,
-                    'sale' => 0,
-                    'detail' => 'Healthy oil-free cooking with App control.',
-                    'quantity' => 30,
+                    'sale' => 7,
+                    'detail' => 'Bảng điều khiển cảm ứng chạm-trượt với màn hình hiển thị LCD.',
+                    'quantity' => 34,
                     'quantity_sold' => 10
+                ],
+                [
+                    'id_category' => 3,
+                    'id_brand' => 4,
+                    'name' => 'Hút mùi Canzy CZ 3470',
+                    'image' => json_encode(['productImages/hut-mui-canzy-cz-3470.jpg']),
+                    'price' => 4250000,
+                    'status' => 1,
+                    'sale' => 18,
+                    'detail' => 'Phím điều khiển: nút nhấn cơ điện tử.',
+                    'quantity' => 50,
+                    'quantity_sold' => 12
+                ],
+                [
+                    'id_category' => 3,
+                    'id_brand' => 9,
+                    'name' => 'Hút mùi kính cong Kocher K8370',
+                    'image' => json_encode(['productImages/hut-mui-kinh-cong-kocher-k8370.jpg']),
+                    'price' => 4125000,
+                    'status' => 1,
+                    'sale' => 15,
+                    'detail' => 'Kiểu dáng: Toa kính cong gắn tường.',
+                    'quantity' => 50,
+                    'quantity_sold' => 12
+                ],
+                [
+                    'id_category' => 3,
+                    'id_brand' => 5,
+                    'name' => 'Hút mùi YAMATO YT-269H-S',
+                    'image' => json_encode(['productImages/hut-mui-yamato-yt-269h-s.jpg']),
+                    'price' => 11500000,
+                    'status' => 1,
+                    'sale' => 13,
+                    'detail' => 'Bộ lọc: 02 tấm lọc nhôm + 02 tấm lọc than hoạt tính khử mùi.',
+                    'quantity' => 70,
+                    'quantity_sold' => 12
                 ]
             ];
 

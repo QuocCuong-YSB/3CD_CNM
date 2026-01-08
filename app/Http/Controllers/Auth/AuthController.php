@@ -185,7 +185,7 @@ class AuthController extends Controller
                     'provider' => 'google',
                     'avatar' => $avatar,
                     'password' => '',
-                    'level' => 1,
+                    'level' => 0,
                     'is_active' => 1,
                     'address' => '',
                     'id_country' => 1
