@@ -25,3 +25,13 @@ yarn-error.log
 
 .DS_Store
 Thumbs.db
+
+# Laravel Specific
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/app/public/*
+/public/productImages/
+!/storage/framework/cache/data/.gitkeep
+!/storage/framework/sessions/.gitkeep
+!/storage/framework/views/.gitkeep

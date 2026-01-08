@@ -4,13 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateReviewsTable extends Migration
+return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('reviews', function (Blueprint $table) {
@@ -25,18 +20,13 @@ class CreateReviewsTable extends Migration
             $table->text('comment');
             $table->timestamps();
 
-            $table->unique(['user_id', 'product_id']);
+            $table->unique(['id_user', 'id_product']);
+            $table->foreign('order_code')->references('order_code')->on('histories')->cascadeOnDelete();
         });
     }
 
-
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('reviews');
     }
-}
+};

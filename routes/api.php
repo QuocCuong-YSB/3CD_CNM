@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Member\MemberController as MemberMemberController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\ChatController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -23,12 +24,17 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/verify', [AuthController::class, 'verifyCode']);
 Route::post('/resend', [AuthController::class, 'resendCode']);
 Route::get('/member/country', [CountryController::class, 'index']);
-Route::get('/product/search', [ProductController::class, 'search']);
+Route::get('/member/category', [CategoryController::class, 'index']);
+Route::get('/member/brand', [BrandController::class, 'index']);
+Route::get('/member/sidebar-data', [CategoryController::class, 'getSidebarData']);
+Route::get('/member/product', [ProductController::class, 'index']);
+Route::get('/member/product/show/{id}', [ProductController::class, 'show']);
+Route::get('/member/search/product', [ProductController::class, 'search']);
 Route::post('/login/google', [AuthController::class, 'loginWithGoogle']);
 Route::get('/product/{id}/reviews', [ReviewController::class, 'getByProduct']);
 
 Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:1'])->prefix('admin')->group(function () {
-    
+
     Route::get('/product', [ProductController::class, 'index']);
     Route::get('/trash-product', [ProductController::class, 'trash']);
     Route::get('/trash-product/count', [ProductController::class, 'countTrashProduct']);
@@ -58,7 +64,7 @@ Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:1'])->prefix
     // Admin Orders
     Route::get('/orders', [AdminOrderController::class, 'index']);
     Route::put('/order/{id}/status', [AdminOrderController::class, 'updateStatus']);
-    
+
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
@@ -85,6 +91,14 @@ Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:0'])->prefix
 
     // Review Products
     Route::post('/review', [ReviewController::class, 'store']);
+});
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('/send-message', [ChatController::class, 'send']);
+    Route::get('/messages/{userId}', [ChatController::class, 'history']);
+    Route::get('/conversations', [ChatController::class, 'conversations']);
+    Route::post('/mark-as-read', [ChatController::class, 'markAsRead']);
+    Route::get('/unread-count', [ChatController::class, 'unreadCount']);
+    Route::get('/history', [ChatController::class, 'historyUser']);
 });
 
 

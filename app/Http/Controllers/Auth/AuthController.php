@@ -23,7 +23,7 @@ class AuthController extends Controller
     {
         $data = $request->validated();
 
-        $dataimg=[];
+        $dataimg = [];
         if ($request->hasFile('avatar')) {
             foreach ($request->file('avatar') as $file) {
                 $filename = time() . '_' . $file->getClientOriginalName();
@@ -35,7 +35,7 @@ class AuthController extends Controller
         }
 
         $data['password'] = bcrypt($data['password']);
-        $data['avatar']=json_encode($dataimg);
+        $data['avatar'] = json_encode($dataimg);
         Verification::where('email', $data['email'])->delete();
         $code = rand(100000, 999999);
         $expiresAt = Carbon::now()->addMinutes(10);
@@ -66,7 +66,7 @@ class AuthController extends Controller
             return response()->json(['error' => 'Mã xác thực không tồn tại hoặc đã hết hạn.'], 400);
         }
 
-        if ((int)$record->code !== (int)$request->code) {
+        if ((int) $record->code !== (int) $request->code) {
             return response()->json(['error' => 'Mã xác thực không chính xác.'], 400);
         }
 
@@ -76,7 +76,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Đăng ký thành công!',
-            'user' => $user->only(['id','name','email','phone','address','avatar','level','id_country'])
+            'user' => $user->only(['id', 'name', 'email', 'phone', 'address', 'avatar', 'level', 'id_country'])
         ], 200);
     }
 
@@ -92,7 +92,7 @@ class AuthController extends Controller
         $now = Carbon::now();
         $diff = $now->diffInSeconds($record->last_sent_at);
         if ($diff < 60) {
-            return response()->json(['error' => "Vui lòng đợi ".(60-$diff)." giây để gửi lại mã."], 429);
+            return response()->json(['error' => "Vui lòng đợi " . (60 - $diff) . " giây để gửi lại mã."], 429);
         }
 
         $code = rand(100000, 999999);
@@ -111,10 +111,10 @@ class AuthController extends Controller
         $user = User::where('email', $userRequest['email'])->first();
         if (!$user || !Hash::check($userRequest['password'], $user->password)) {
             return response()->json([
-            'message' => 'Email hoặc mật khẩu không đúng',
+                'message' => 'Email hoặc mật khẩu không đúng',
             ], 401);
         }
-        if ((int)$user->level !== (int)$userRequest['level']) {
+        if ((int) $user->level !== (int) $userRequest['level']) {
             return response()->json([
                 'message' => 'Email hoặc mật khẩu không đúng',
             ], 403);
@@ -124,7 +124,7 @@ class AuthController extends Controller
                 'message' => 'Tài khoản đã bị khóa'
             ], 403);
         }
-        $tokenInstance = $user->createToken('access-token'); 
+        $tokenInstance = $user->createToken('access-token');
         $token = $tokenInstance->plainTextToken;
         $tokenInstance->accessToken->expires_at = Carbon::now()->addHour();
         $tokenInstance->accessToken->save();
@@ -147,68 +147,75 @@ class AuthController extends Controller
 
     public function loginWithGoogle(Request $request)
     {
-        $request->validate([
-            'token' => 'required|string'
-        ]);
-
-        $client = new GoogleClient([
-            'client_id' => env('GOOGLE_CLIENT_ID')
-        ]);
-
-        // Verify token với Google
-        $payload = $client->verifyIdToken($request->token);
-
-        if (!$payload) {
-            return response()->json([
-                'message' => 'Token Google không hợp lệ'
-            ], 401);
-        }
-
-        // Thông tin user từ Google
-        $googleId = $payload['sub'];
-        $email    = $payload['email'];
-        $name     = $payload['name'] ?? '';
-        $avatar   = $payload['picture'] ?? '';
-
-        // Tìm user theo google_id hoặc email
-        $user = User::where('google_id', $googleId)
-            ->orWhere('email', $email)
-            ->first();
-
-        if (!$user) {
-            // Chưa có → tạo mới
-            $user = User::create([
-                'name'       => $name,
-                'email'      => $email,
-                'google_id'  => $googleId,
-                'provider'   => 'google',
-                'avatar'     => $avatar,
-                'password'   => '',
-                'level'      => 1,
-                'is_active'  => 1,
-                'address'    => '',
-                'id_country' => 1
+        try {
+            $request->validate([
+                'token' => 'required|string'
             ]);
-        } else {
-            // Có rồi nhưng chưa liên kết Google
-            if (!$user->google_id) {
-                $user->update([
-                    'google_id' => $googleId,
-                    'provider'  => 'google',
-                    'avatar'    => $avatar
-                ]);
+
+            $client = new GoogleClient([
+                'client_id' => env('GOOGLE_CLIENT_ID')
+            ]);
+
+            // Verify token với Google
+            $payload = $client->verifyIdToken($request->token);
+
+            if (!$payload) {
+                return response()->json([
+                    'message' => 'Token Google không hợp lệ'
+                ], 401);
             }
+
+            // Thông tin user từ Google
+            $googleId = $payload['sub'];
+            $email = $payload['email'];
+            $name = $payload['name'] ?? '';
+            $avatar = $payload['picture'] ?? '';
+
+            // Tìm user theo google_id hoặc email
+            $user = User::where('google_id', $googleId)
+                ->orWhere('email', $email)
+                ->first();
+
+            if (!$user) {
+                // Chưa có → tạo mới
+                $user = User::create([
+                    'name' => $name,
+                    'email' => $email,
+                    'google_id' => $googleId,
+                    'provider' => 'google',
+                    'avatar' => $avatar,
+                    'password' => '',
+                    'level' => 0,
+                    'is_active' => 1,
+                    'address' => '',
+                    'id_country' => 1
+                ]);
+            } else {
+                // Có rồi nhưng chưa liên kết Google
+                if (!$user->google_id) {
+                    $user->update([
+                        'google_id' => $googleId,
+                        'provider' => 'google',
+                        'avatar' => $avatar
+                    ]);
+                }
+            }
+
+            // Tạo token đăng nhập (Sanctum)
+            $tokenInstance = $user->createToken('access-token');
+            $token = $tokenInstance->plainTextToken;
+
+            return response()->json([
+                'message' => 'Login Google thành công',
+                'user' => $user,
+                'token' => $token
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Lỗi hệ thống khi đăng nhập Google',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        // Tạo token đăng nhập (Sanctum)
-        $tokenInstance = $user->createToken('access-token');
-        $token = $tokenInstance->plainTextToken;
-
-        return response()->json([
-            'message' => 'Login Google thành công',
-            'user'    => $user,
-            'token'   => $token
-        ], 200);
     }
 }
 

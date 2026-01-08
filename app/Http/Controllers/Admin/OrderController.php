@@ -4,16 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Order;
+use App\Models\History;
 
 class OrderController extends Controller
 {
-    /**
-     * Get all orders
-     */
+    // Lấy danh sách tất cả đơn hàng (Admin)
     public function index()
     {
-        $orders = Order::with('items.product', 'user')
+        $orders = History::with(['product', 'user'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -22,23 +20,23 @@ class OrderController extends Controller
         ]);
     }
 
-    /**
-     * Confirm/Update order status
-     */
+    // Cập nhật trạng thái đơn hàng (Admin)
     public function updateStatus(Request $request, $id)
     {
-        $order = Order::find($id);
+        $order = History::find($id);
         if (!$order) {
             return response()->json(['error' => 'Đơn hàng không tồn tại.'], 404);
         }
 
         $request->validate([
-            'status' => 'required|integer|in:1,2,3'
+            'status' => 'required|integer|in:0,1,2,3'
         ]);
 
-        $order->status = $request->status;
-        $order->save();
+        // Cập nhật trạng thái toàn bộ items trong cùng mã đơn hàng
+        History::where('order_code', $order->order_code)
+            ->update(['status' => $request->status]);
 
-        return response()->json(['message' => 'Cập nhật trạng thái đơn hàng thành công!']);
+        return response()->json(['message' => 'Cập nhật trạng thái thành công!']);
     }
 }
+

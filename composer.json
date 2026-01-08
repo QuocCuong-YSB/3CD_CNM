@@ -2,11 +2,14 @@
     "name": "laravel/laravel",
     "type": "project",
     "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
+    "keywords": [
+        "framework",
+        "laravel"
+    ],
     "license": "MIT",
     "require": {
         "php": "^7.3|^8.0",
-        "doctrine/dbal": "3.10.4",
+        "doctrine/dbal": "^3.10",
         "fruitcake/laravel-cors": "^2.0",
         "google/apiclient": "^2.18",
         "guzzlehttp/guzzle": "^7.0.1",
@@ -14,7 +17,8 @@
         "laravel/framework": "^8.75",
         "laravel/sanctum": "^2.11",
         "laravel/socialite": "^5.24",
-        "laravel/tinker": "^2.5"
+        "laravel/tinker": "^2.5",
+        "pusher/pusher-php-server": "^7.2"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
@@ -57,7 +61,7 @@
         }
     },
     "config": {
-        "optimize-autoloader": true,
+        "optimize-autoloader": false,
         "preferred-install": "dist",
         "sort-packages": true
     },

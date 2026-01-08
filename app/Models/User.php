@@ -30,7 +30,7 @@ class User extends Authenticatable
         'avatar',
         'google_id',
         'provider',
-
+        'level',
     ];
 
     /**
@@ -63,7 +63,7 @@ class User extends Authenticatable
     ];
     public function isAdmin()
     {
-        return $this->level === 0;
+        return $this->level === 1;
     }
 
     public function orders()
@@ -73,6 +73,6 @@ class User extends Authenticatable
 
     public function isMember()
     {
-        return $this->level === 1;
+        return $this->level === 0;
     }
 }
