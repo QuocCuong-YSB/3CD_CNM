@@ -5,8 +5,12 @@ import { GoogleLogin } from '@react-oauth/google';
 import auth from '../../API/auth';
 import './Login.css';
 import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { setCartDetails } from '../../features/cart/Cart';
+
 
 function LoginMember() {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     let [err, SetErr] = useState({});
     const [input, SetInput] = useState({
@@ -64,6 +68,19 @@ function LoginMember() {
 
                     window.dispatchEvent(new Event('user-updated'));
 
+                    apiMember.get('/cart')
+                        .then(cartRes => {
+                            const cartItems = {};
+                            cartRes.data.data.forEach(item => {
+                                cartItems[item.product_id] = item.quantity;
+                            });
+
+                            dispatch(setCartDetails(cartItems));
+                        })
+                        .catch(() => {
+                            dispatch(setCartDetails({}));
+                        });
+
                     toast.success('Đăng nhập thành công');
                     navigate('/member/home');
                 })
@@ -95,6 +112,14 @@ function LoginMember() {
             localStorage.setItem('IdUser', res.data.user.id);
 
             window.dispatchEvent(new Event('user-updated'));
+
+            const cartRes = await apiMember.get('/cart');
+            const cartItems = {};
+            cartRes.data.data.forEach(item => {
+                cartItems[item.product_id] = item.quantity;
+            });
+            dispatch(setCartDetails(cartItems));
+
             toast.success('Đăng nhập bằng Google thành công');
             navigate('/member/home');
         } catch (error) {

@@ -47,7 +47,7 @@ function ProductDetail() {
         });
 
         apiMember
-            .get('/product/' + id + '/reviews')
+            .get(`/product/${id}/reviews`)
             .then((res) => {
                 const data = Array.isArray(res.data.data) ? res.data.data : [];
                 console.log(data);
@@ -123,8 +123,11 @@ function ProductDetail() {
             headers: { Authorization: `Bearer ${token}` },
         };
 
-        apiMember
-            .post(`/product/${id}/review`, { rating: currentRating, comment: commentText }, config)
+        apiMember.post(`/product/${id}/reviews`, {
+            product_id: id,
+            rating: currentRating,
+            comment: commentText
+        }, config)
             .then((res) => {
                 toast.success('Đánh giá thành công!');
                 setCommentText('');
@@ -132,10 +135,13 @@ function ProductDetail() {
                 setCommentText('');
                 setCurrentRating(0);
                 setShowReviewForm(false);
-                apiMember.get('/product/' + id + '/reviews').then((r) => {
-                    const data = r.data.data || [];
-                    setReviews(data);
-                });
+
+                apiMember
+                    .get(`/product/${id}/reviews`)
+                    .then((r) => {
+                        const data = r.data.data || [];
+                        setReviews(data);
+                    });
             })
             .catch((err) => {
                 console.error(err);
@@ -338,7 +344,12 @@ function ProductDetail() {
                                 </tr>
                                 <tr>
                                     <th>Thương hiệu</th>
-                                    <td>{input.id_brand?.name || input.brand || input.company}</td>
+                                    <td>
+                                        {input.id_brand?.name ||
+                                            input.brand?.name ||
+                                            input.company?.name ||
+                                            'Đang cập nhật'}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <th>Chi tiết</th>
