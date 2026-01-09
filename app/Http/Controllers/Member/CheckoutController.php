@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\History;
 use App\Models\Product;
+use App\Models\Cart;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -111,6 +112,8 @@ class CheckoutController extends Controller
             $product->decrement('quantity', $quantity);
             $product->increment('quantity_sold', $quantity);
         }
+
+        Cart::where('user_id', $user['id'])->delete();
 
         DB::commit();
 
