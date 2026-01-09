@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 const apiMember = axios.create({
     baseURL: `http://localhost:8000/api/member`,
     headers: {
-        'Content-Type': 'application/json',
+        // 'Content-Type': 'application/json',
         'Accept': 'application/json',
     },
 });
@@ -12,6 +12,9 @@ apiMember.interceptors.request.use((config) => {
     const token = localStorage.getItem('token');
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+    }
+    if (!(config.data instanceof FormData)) {
+        config.headers['Content-Type'] = 'application/json';
     }
     return config;
 });
