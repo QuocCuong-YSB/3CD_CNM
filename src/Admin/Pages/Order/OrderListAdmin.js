@@ -58,7 +58,7 @@ function OrderListAdmin() {
         if (!result.isConfirmed) return;
 
         try {
-            const res = await apiAdmin.put(`/order/${orderId}/confirm`, {}, config);
+            const res = await apiAdmin.put(`/order/${orderId}/status`, { status: 1 }, config);
             toast.success(res.data.message);
             getOrders();
         } catch (error) {
@@ -69,7 +69,7 @@ function OrderListAdmin() {
     const groupOrdersByCode = (orderList) => {
         const grouped = {};
         orderList.forEach((order) => {
-            const code = order.orderCode || `ORDER-${new Date(order.createdAt).getTime()}`;
+            const code = order.order_code || `ORDER-${new Date(order.created_at).getTime()}`;
             if (!grouped[code]) {
                 grouped[code] = [];
             }
@@ -109,15 +109,15 @@ function OrderListAdmin() {
                             Object.entries(groupedOrders).map(([code, items]) => {
                                 const firstOrder = items[0];
                                 const total = items.reduce(
-                                    (sum, item) => sum + item.price * (item.quantity || item.qualty),
+                                    (sum, item) => sum + item.price * (item.quantity || item.qualty || 0),
                                     0,
                                 );
-                                const user = firstOrder.id_user;
+                                const user = firstOrder.user;
 
                                 return (
                                     <tr key={code}>
                                         <td>{code}</td>
-                                        <td>{formatDate(firstOrder.createdAt)}</td>
+                                        <td>{formatDate(firstOrder.created_at)}</td>
                                         <td>
                                             {user ? (
                                                 <>
@@ -128,24 +128,24 @@ function OrderListAdmin() {
                                                     <p>{firstOrder.address}</p>
                                                 </>
                                             ) : (
-                                                'N/A'
+                                                <p>{firstOrder.address}</p>
                                             )}
                                         </td>
                                         <td>
                                             <ul style={{ listStyle: 'none', padding: 0 }}>
                                                 {items.map((item, idx) => (
                                                     <li key={idx} style={{ marginBottom: '5px' }}>
-                                                        {item.id_product?.name} x {item.quantity || item.qualty}
+                                                        {item.product?.name} x {item.quantity || item.qualty}
                                                     </li>
                                                 ))}
                                             </ul>
                                         </td>
                                         <td>{formatPrice(total)}</td>
-                                        <td>{firstOrder.paymentMethod === 'paypal' ? 'PayPal' : 'Tiền mặt (COD)'}</td>
+                                        <td>{firstOrder.payment_method === 'paypal' ? 'PayPal' : 'Tiền mặt (COD)'}</td>
                                         <td>
                                             <button
-                                                className="btn btn-success btn-sm"
-                                                onClick={() => handleConfirmOrder(items[0]._id)}
+                                                className="btn btn-primary btn-sm"
+                                                onClick={() => handleConfirmOrder(code)}
                                             >
                                                 Xác nhận
                                             </button>

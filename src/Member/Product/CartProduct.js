@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import apiMember from '../../API/apiMember';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setCartDetails } from '../../features/cart/Cart';
 import { toast } from 'react-toastify';
 import Breadcrumb from '../../component/Member/Breadcrumb';
 import './CartProduct.css';
@@ -15,6 +17,8 @@ function formatPrice(price) {
 function CartProduct() {
     const [cartData, setCartData] = useState([]);
     const [totalAmount, setTotalAmount] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const fetchCart = async () => {
@@ -23,8 +27,10 @@ function CartProduct() {
             const carts = Array.isArray(res.data.data) ? res.data.data : [];
             setCartData(carts);
 
+            const reduxCart = {};
             let total = 0;
             carts.forEach((item) => {
+                reduxCart[item.product_id] = item.quantity;
                 const product = item.product;
                 const price =
                     product.sale > 0
@@ -33,9 +39,12 @@ function CartProduct() {
                 total += price * item.quantity;
             });
 
+            dispatch(setCartDetails(reduxCart));
             setTotalAmount(total);
         } catch (err) {
             toast.error('Không thể tải giỏ hàng');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -79,17 +88,7 @@ function CartProduct() {
         navigate('/member/product/checkout');
     };
 
-    const renderCart = () => {
-        if (!cartData.length) {
-            return (
-                <tr>
-                    <td colSpan="5" style={{ textAlign: 'center', padding: 30 }}>
-                        Giỏ hàng trống
-                    </td>
-                </tr>
-            );
-        }
-
+    const renderCartItems = () => {
         return cartData.map((item) => {
             const product = item.product;
             const image =
@@ -104,7 +103,7 @@ function CartProduct() {
 
             return (
                 <tr key={product.id}>
-                    <td>
+                    <td data-label="Sản phẩm">
                         <div className="product-info">
                             <img
                                 src={`http://localhost:8000/${image}`}
@@ -116,9 +115,11 @@ function CartProduct() {
                         </div>
                     </td>
 
-                    <td>{formatPrice(price)}</td>
+                    <td data-label="Giá">
+                        <span className="price-text">{formatPrice(price)}</span>
+                    </td>
 
-                    <td>
+                    <td data-label="Số lượng">
                         <div className="quantity-control">
                             <button onClick={() => decreaseQty(product.id)}>−</button>
                             <input value={item.quantity} readOnly />
@@ -126,14 +127,17 @@ function CartProduct() {
                         </div>
                     </td>
 
-                    <td>{formatPrice(price * item.quantity)}</td>
+                    <td data-label="Tổng">
+                        <span className="total-text">{formatPrice(price * item.quantity)}</span>
+                    </td>
 
-                    <td>
+                    <td data-label="Hành động">
                         <button
                             className="delete-btn"
                             onClick={() => removeItem(product.id)}
+                            title="Xóa khỏi giỏ hàng"
                         >
-                            ✕
+                            <i className="fa fa-trash"></i>
                         </button>
                     </td>
                 </tr>
@@ -141,40 +145,83 @@ function CartProduct() {
         });
     };
 
+    if (isLoading) {
+        return (
+            <div className="cart-container" style={{ padding: '100px 0', textAlign: 'center' }}>
+                <div className="spinner-border text-primary" role="status">
+                    <span className="sr-only">Đang tải...</span>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <section id="cart_items_new">
-            <Breadcrumb items={[{ label: 'Giỏ hàng' }]} />
-            <h2 className="cart_title">Giỏ Hàng</h2>
+            <div className="cart-container">
+                <Breadcrumb items={[{ label: 'Giỏ hàng' }]} />
+                <h2 className="cart_title">Giỏ Hàng Của Bạn</h2>
 
-            <table className="cart-table">
-                <thead>
-                    <tr>
-                        <th>Sản phẩm</th>
-                        <th>Giá</th>
-                        <th>Số lượng</th>
-                        <th>Tổng</th>
-                        <th>Xóa</th>
-                    </tr>
-                </thead>
-                <tbody>{renderCart()}</tbody>
-            </table>
+                {!cartData.length ? (
+                    <div className="empty-cart-container">
+                        <div className="empty-cart-icon">
+                            <i className="fa fa-shopping-basket"></i>
+                        </div>
+                        <h3>Giỏ hàng đang trống!</h3>
+                        <p>Có vẻ như bạn chưa thêm sản phẩm nào vào giỏ hàng của mình.</p>
+                        <Link to="/member/home" className="empty-cart-btn">
+                            Khám Phá Sản Phẩm Ngay
+                        </Link>
+                    </div>
+                ) : (
+                    <div className="cart-content-wrapper">
+                        <div className="cart-main-content">
+                            <div className="cart-table-wrapper">
+                                <table className="cart-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Sản phẩm</th>
+                                            <th>Giá</th>
+                                            <th>Số lượng</th>
+                                            <th>Tổng</th>
+                                            <th>Xóa</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>{renderCartItems()}</tbody>
+                                </table>
+                            </div>
 
-            <div className="cart-total-box">
-                <ul>
-                    <li>
-                        Tạm tính <span>{formatPrice(totalAmount)}</span>
-                    </li>
-                    <li>
-                        Phí vận chuyển <span>Free</span>
-                    </li>
-                    <li className="total">
-                        Tổng cộng <span>{formatPrice(totalAmount)}</span>
-                    </li>
-                </ul>
+                            <Link to="/member/home" className="continue-shopping">
+                                <i className="fa fa-arrow-left"></i> Tiếp tục mua sắm
+                            </Link>
+                        </div>
 
-                <button className="checkout-btn" onClick={handleCheckout}>
-                    Thanh toán
-                </button>
+                        <aside className="cart-sidebar">
+                            <div className="cart-total-box">
+                                <h3>
+                                    <i className="fa fa-receipt"></i> Tóm tắt đơn hàng
+                                </h3>
+                                <ul>
+                                    <li>
+                                        <span>Tạm tính ({cartData.length} sản phẩm)</span>
+                                        <span>{formatPrice(totalAmount)}</span>
+                                    </li>
+                                    <li>
+                                        <span>Phí vận chuyển</span>
+                                        <span style={{ color: '#38a169' }}>Miễn phí</span>
+                                    </li>
+                                    <li className="total">
+                                        <span>Tổng cộng</span>
+                                        <span>{formatPrice(totalAmount)}</span>
+                                    </li>
+                                </ul>
+
+                                <button className="checkout-btn" onClick={handleCheckout}>
+                                    Tiến hành thanh toán <i className="fa fa-chevron-right" style={{ fontSize: '12px' }}></i>
+                                </button>
+                            </div>
+                        </aside>
+                    </div>
+                )}
             </div>
         </section>
     );
