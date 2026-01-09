@@ -19,10 +19,10 @@ class StoreProductRequest extends BaseRequest
             'price'       => 'required|numeric',
             'detail'      => 'required|string',
             'quantity'    => 'required|integer|min:1',
-            'sale'        => 'required|numeric',
+            'sale'        => 'nullable|numeric|min:0',
 
-            'image'   => 'required|array|max:3',
-            'image.*' => 'file|max:2048',
+            'image'   => 'required|array|min:1|max:3',
+            'image.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
         ];
     }
 
