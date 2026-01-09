@@ -17,8 +17,8 @@ function CartProduct() {
     const [cartData, setCartData] = useState([]);
     const [totalAmount, setTotalAmount] = useState(0);
     const [loadingId, setLoadingId] = useState(null);
-    const { fetchCartCount } = useContext(MemberCartContext);
 
+    const { fetchCartCount } = useContext(MemberCartContext);
     const navigate = useNavigate();
 
     const fetchCart = async () => {
@@ -50,12 +50,13 @@ function CartProduct() {
     const increaseQty = async (productId) => {
         if (loadingId) return;
         setLoadingId(productId);
+
         try {
             await apiMember.put(`/cart/product/${productId}`, { quantity: 1 });
             await fetchCart();
             fetchCartCount && fetchCartCount();
         } catch (err) {
-            toast.error(err.response?.data?.message);
+            toast.error(err.response?.data?.message || 'Lỗi tăng số lượng');
         } finally {
             setLoadingId(null);
         }
@@ -64,12 +65,13 @@ function CartProduct() {
     const decreaseQty = async (productId) => {
         if (loadingId) return;
         setLoadingId(productId);
+
         try {
             await apiMember.put(`/cart/product/${productId}`, { quantity: -1 });
             await fetchCart();
             fetchCartCount && fetchCartCount();
         } catch (err) {
-            toast.error(err.response?.data?.message);
+            toast.error(err.response?.data?.message || 'Lỗi giảm số lượng');
         } finally {
             setLoadingId(null);
         }
@@ -78,6 +80,7 @@ function CartProduct() {
     const removeItem = async (productId) => {
         if (loadingId) return;
         setLoadingId(productId);
+
         try {
             await apiMember.delete(`/cart/product/${productId}`);
             toast.success('Đã xóa sản phẩm khỏi giỏ hàng');
@@ -136,11 +139,8 @@ function CartProduct() {
                     </td>
 
                     <td>{formatPrice(price)}</td>
-
-                    {/* CỘT KHO */}
                     <td>{product.quantity}</td>
 
-                    {/* CỘT SỐ LƯỢNG */}
                     <td>
                         <div className="quantity-control">
                             <button

@@ -66,7 +66,11 @@ function CreateProduct() {
                 formData.append('image[]', image[i]);
             }
 
-            await apiAdmin.post('/product', formData);
+            await apiAdmin.post('/product', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
             toast.success('Thêm sản phẩm thành công!');
             navigate('/admin/product-list');
         } catch (error) {

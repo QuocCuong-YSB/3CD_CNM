@@ -109,25 +109,35 @@ function ProductDetail() {
         }
     }, [filterType, reviews]);
 
-    function AddProductToCart() {
-        const user = localStorage.getItem('user');
-        if (user) {
-            const stock = input.quantity;
-            if (stock <= 0) {
-                toast.error('Sản phẩm này đã hết hàng');
-                return;
-            }
+    async function AddProductToCart() {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            toast.warn('Vui lòng đăng nhập');
+            return;
+        }
 
-            if (quantity <= 0) {
-                toast.warn('Vui lòng chọn số lượng lớn hơn 0');
-                return;
-            }
+        const stock = input.quantity || input.quality || 0;
+        if (stock <= 0) {
+            toast.error('Sản phẩm này đã hết hàng');
+            return;
+        }
+
+        if (quantity <= 0) {
+            toast.warn('Vui lòng chọn số lượng lớn hơn 0');
+            return;
+        }
+
+        try {
+            await apiMember.post('/cart', {
+                product_id: id,
+                quantity: quantity
+            });
 
             dispatch(addToCart({ id, qty: quantity }));
-
             toast.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng`);
-        } else {
-            toast.warn('Vui lòng đăng nhập');
+        } catch (err) {
+            console.error(err.response?.data || err.message);
+            toast.error('Thêm sản phẩm vào giỏ thất bại');
         }
     }
 

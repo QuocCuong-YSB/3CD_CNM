@@ -86,10 +86,11 @@ function CheckOut() {
                 SetInputProducts(products);
 
                 let total = 0;
-                products.forEach((value) => {
-                    const is_on_sale = value.sale > 0;
-                    const price = is_on_sale ? value.price * (1 - value.sale / 100) : value.price;
-                    total += price * value.qty;
+                products.forEach((item) => {
+                    const product = item.product;
+                    const is_on_sale = product.sale > 0;
+                    const price = is_on_sale ? product.price * (1 - product.sale / 100) : product.price;
+                    total += price * item.quantity;
                 });
                 SetAllQuantityCart(total);
             } catch (err) {
@@ -121,24 +122,20 @@ function CheckOut() {
         if (inputProducts.length === 0)
             return <div style={{ padding: '20px', textAlign: 'center' }}>Giỏ hàng trống</div>;
 
-        return inputProducts.map((value, index) => {
-            let avatar = [];
-            try {
-                avatar = JSON.parse(value.image) || [];
-            } catch {
-                avatar = [];
-            }
-            const is_on_sale = value.sale > 0;
-            const new_price = is_on_sale ? value.price * (1 - value.sale / 100) : value.price;
+        return inputProducts.map((item, index) => {
+            const product = item.product;
+            const avatars = Array.isArray(product.image) ? product.image : [];
+            const is_on_sale = product.sale > 0;
+            const new_price = is_on_sale ? product.price * (1 - product.sale / 100) : product.price;
 
             return (
                 <div className="order-product-item" key={index}>
-                    <img src={`http://localhost:8000/${avatar[0] || 'no-image.png'}`} alt={value.name} />
+                    <img src={`http://localhost:8000/${avatars[0] || 'no-image.png'}`} alt={product.name} />
                     <div className="order-product-info">
                         <span className="name">
-                            {value.name} (x{value.qty})
+                            {product.name} (x{item.quantity})
                         </span>
-                        <span className="price">{formatPrice(new_price * value.qty)}</span>
+                        <span className="price">{formatPrice(new_price * item.quantity)}</span>
                     </div>
                 </div>
             );
@@ -334,10 +331,10 @@ function CheckOut() {
                                         {field === 'name'
                                             ? 'Họ và Tên'
                                             : field === 'address'
-                                            ? 'Địa chỉ'
-                                            : field === 'phone'
-                                            ? 'Số điện thoại'
-                                            : 'Email'}{' '}
+                                                ? 'Địa chỉ'
+                                                : field === 'phone'
+                                                    ? 'Số điện thoại'
+                                                    : 'Email'}{' '}
                                         <span>*</span>
                                     </label>
                                     <input
@@ -421,9 +418,8 @@ function CheckOut() {
                                     {showVoucherList && (
                                         <div className="voucher-list">
                                             <div
-                                                className={`voucher-item ${hasPurchased ? 'disabled' : ''} ${
-                                                    voucherApplied ? 'active' : ''
-                                                }`}
+                                                className={`voucher-item ${hasPurchased ? 'disabled' : ''} ${voucherApplied ? 'active' : ''
+                                                    }`}
                                                 onClick={() => !hasPurchased && setVoucherApplied(!voucherApplied)}
                                             >
                                                 <div className="voucher-info">

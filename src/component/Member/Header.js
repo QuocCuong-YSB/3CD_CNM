@@ -70,11 +70,21 @@ function Header() {
         navigate(`/member/home/product/detail/${product.id}`);
     }
 
-    const [user, setUser] = useState(localStorage.getItem('user'));
+    const [user, setUser] = useState(() => {
+        try {
+            return JSON.parse(localStorage.getItem('user')) || null;
+        } catch (e) {
+            return null;
+        }
+    });
 
     useEffect(() => {
         const handleUserUpdate = () => {
-            setUser(JSON.parse(localStorage.getItem('user')));
+            try {
+                setUser(JSON.parse(localStorage.getItem('user')) || null);
+            } catch (e) {
+                setUser(null);
+            }
         };
 
         window.addEventListener('user-updated', handleUserUpdate);

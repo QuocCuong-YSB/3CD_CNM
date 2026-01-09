@@ -81,7 +81,7 @@ function OrderList() {
         }
     }, [idUser]);
 
-    const handleMarkAsDelivered = async (orderId) => {
+    const handleMarkAsDelivered = async (orderCode) => {
         const result = await confirmDialog({
             title: 'Xác nhận đã nhận hàng?',
             text: 'Bạn có chắc chắn đã nhận được sản phẩm này không?',
@@ -90,7 +90,7 @@ function OrderList() {
         if (!result.isConfirmed) return;
 
         try {
-            const res = await apiMember.put(`/order/${orderId}/delivered`, {}, config);
+            const res = await apiMember.put(`/order/${orderCode}/delivered`, {}, config);
             toast.success(res.data.message);
             getOrders();
         } catch (error) {
@@ -107,7 +107,7 @@ function OrderList() {
                             Accept: 'application/json',
                         },
                     };
-                    const res2 = await apiMember.put(`/order/${orderId}/delivered`, {}, newConfig);
+                    const res2 = await apiMember.put(`/order/${orderCode}/delivered`, {}, newConfig);
                     toast.success(res2.data.message);
                     getOrders();
                 } catch (refreshError) {
@@ -119,7 +119,7 @@ function OrderList() {
         }
     };
 
-    const handleCancelOrder = async (orderId) => {
+    const handleCancelOrder = async (orderCode) => {
         const result = await confirmDialog({
             title: 'Xác nhận hủy đơn hàng?',
             text: 'Bạn có chắc chắn muốn hủy đơn hàng này không?',
@@ -128,7 +128,7 @@ function OrderList() {
         if (!result.isConfirmed) return;
 
         try {
-            const res = await apiMember.put(`/order/${orderId}/cancel`, {}, config);
+            const res = await apiMember.put(`/order/${orderCode}/cancel`, {}, config);
             toast.success(res.data.message);
             getOrders();
         } catch (error) {
@@ -145,7 +145,7 @@ function OrderList() {
                             Accept: 'application/json',
                         },
                     };
-                    const res2 = await apiMember.put(`/order/${orderId}/cancel`, {}, newConfig);
+                    const res2 = await apiMember.put(`/order/${orderCode}/cancel`, {}, newConfig);
                     toast.success(res2.data.message);
                     getOrders();
                 } catch (refreshError) {
@@ -164,7 +164,7 @@ function OrderList() {
     const groupOrdersByCode = (orderList) => {
         const grouped = {};
         orderList.forEach((order) => {
-            const code = order.orderCode || `ORDER-${new Date(order.createdAt).getTime()}`;
+            const code = order.order_code || `ORDER-${new Date(order.created_at).getTime()}`;
             if (!grouped[code]) {
                 grouped[code] = [];
             }
@@ -186,7 +186,7 @@ function OrderList() {
                         <strong>Mã đơn hàng: {orderCode}</strong>
                         <span className="order-date">
                             <i className="fas fa-clock" style={{ marginRight: '5px' }}></i>
-                            {formatDate(firstOrder.createdAt)}
+                            {formatDate(firstOrder.created_at)}
                         </span>
                     </div>
                     <div className="order-status-badge">
@@ -203,13 +203,13 @@ function OrderList() {
 
                 <div className="order-items">
                     {items.map((item, idx) => {
-                        const product = item.id_product;
+                        const product = item.product;
                         if (!product) return null;
                         let image = [];
                         try {
-                            image = JSON.parse(product.image || '[]');
+                            image = typeof product.image === 'string' ? JSON.parse(product.image) : product.image;
                         } catch {
-                            image = [];
+                            image = Array.isArray(product.image) ? product.image : [];
                         }
 
                         return (
@@ -232,7 +232,7 @@ function OrderList() {
                         <strong>Tổng cộng: {formatPrice(total)}</strong>
                         <p>
                             Phương thức thanh toán:{' '}
-                            {firstOrder.paymentMethod === 'paypal' ? 'PayPal' : 'Tiền mặt (COD)'}
+                            {firstOrder.payment_method === 'paypal' ? 'PayPal' : 'Tiền mặt (COD)'}
                         </p>
                         {firstOrder.address && <p>Địa chỉ: {firstOrder.address}</p>}
                     </div>
@@ -248,13 +248,13 @@ function OrderList() {
                                 cursor: 'pointer',
                                 marginLeft: '10px',
                             }}
-                            onClick={() => handleCancelOrder(items[0].id)}
+                            onClick={() => handleCancelOrder(orderCode)}
                         >
                             Hủy đơn hàng
                         </button>
                     )}
                     {status === 1 && (
-                        <button className="btn-delivered" onClick={() => handleMarkAsDelivered(items[0].id)}>
+                        <button className="btn-delivered" onClick={() => handleMarkAsDelivered(orderCode)}>
                             Đã nhận hàng
                         </button>
                     )}
@@ -308,17 +308,17 @@ function OrderList() {
             let timeA, timeB;
 
             if (activeTab === 'waiting') {
-                timeA = new Date(firstA.createdAt).getTime();
-                timeB = new Date(firstB.createdAt).getTime();
+                timeA = new Date(firstA.created_at).getTime();
+                timeB = new Date(firstB.created_at).getTime();
             } else if (activeTab === 'delivery') {
-                timeA = new Date(firstA.confirmedAt || firstA.updatedAt).getTime();
-                timeB = new Date(firstB.confirmedAt || firstB.updatedAt).getTime();
+                timeA = new Date(firstA.confirmedAt || firstA.updated_at).getTime();
+                timeB = new Date(firstB.confirmedAt || firstB.updated_at).getTime();
             } else if (activeTab === 'delivered') {
-                timeA = new Date(firstA.deliveredAt || firstA.updatedAt).getTime();
-                timeB = new Date(firstB.deliveredAt || firstB.updatedAt).getTime();
+                timeA = new Date(firstA.deliveredAt || firstA.updated_at).getTime();
+                timeB = new Date(firstB.deliveredAt || firstB.updated_at).getTime();
             } else {
-                timeA = new Date(firstA.cancelledAt || firstA.updatedAt).getTime();
-                timeB = new Date(firstB.cancelledAt || firstB.updatedAt).getTime();
+                timeA = new Date(firstA.cancelledAt || firstA.updated_at).getTime();
+                timeB = new Date(firstB.cancelledAt || firstB.updated_at).getTime();
             }
 
             return timeB - timeA;
@@ -379,11 +379,11 @@ function OrderList() {
                                     <strong>Trạng thái:</strong> <span className="badge delivered">Đã giao hàng</span>
                                 </p>
                                 <p>
-                                    <strong>Ngày đặt:</strong> {formatDate(selectedOrder.firstOrder.createdAt)}
+                                    <strong>Ngày đặt:</strong> {formatDate(selectedOrder.firstOrder.created_at)}
                                 </p>
                                 <p>
                                     <strong>Phương thức thanh toán:</strong>{' '}
-                                    {selectedOrder.firstOrder.paymentMethod === 'paypal' ? 'PayPal' : 'Tiền mặt (COD)'}
+                                    {selectedOrder.firstOrder.payment_method === 'paypal' ? 'PayPal' : 'Tiền mặt (COD)'}
                                 </p>
                                 {selectedOrder.firstOrder.address && (
                                     <p>
@@ -395,13 +395,13 @@ function OrderList() {
                             <div className="order-detail-products">
                                 <h4>Sản phẩm:</h4>
                                 {selectedOrder.items.map((item, idx) => {
-                                    const product = item.id_product;
+                                    const product = item.product;
                                     if (!product) return null;
                                     let image = [];
                                     try {
-                                        image = JSON.parse(product.image || '[]');
+                                        image = typeof product.image === 'string' ? JSON.parse(product.image) : product.image;
                                     } catch {
-                                        image = [];
+                                        image = Array.isArray(product.image) ? product.image : [];
                                     }
 
                                     return (
