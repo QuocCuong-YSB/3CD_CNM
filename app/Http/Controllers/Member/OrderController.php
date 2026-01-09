@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
-    // Lấy danh sách đơn hàng cho Member (History)
+    // Lấy danh sách đơn hàng cho Member
     public function index(Request $request)
     {
         $userId = $request->user()->id;
@@ -24,11 +24,11 @@ class OrderController extends Controller
         ]);
     }
 
-    // Hủy đơn hàng (Chỉ khi status = 0 - Chờ xác nhận)
-    public function cancel(Request $request, $id)
+    // Hủy đơn hàng
+    public function cancel(Request $request, $order_code)
     {
         $userId = $request->user()->id;
-        $order = History::where('id_user', $userId)->where('id', $id)->first();
+        $order = History::where('id_user', $userId)->where('order_code', $order_code)->first();
 
         if (!$order) {
             return response()->json(['error' => 'Đơn hàng không tồn tại.'], 404);
@@ -40,12 +40,10 @@ class OrderController extends Controller
 
         DB::beginTransaction();
         try {
-            // Hủy toàn bộ item có cùng mã đơn hàng
-            History::where('order_code', $order->order_code)
+            History::where('order_code', $order_code)
                 ->update(['status' => 3]);
 
-            // Hoàn tồn kho
-            $items = History::where('order_code', $order->order_code)->get();
+            $items = History::where('order_code', $order_code)->get();
             foreach ($items as $item) {
                 $product = $item->product;
                 if ($product) {
@@ -63,16 +61,16 @@ class OrderController extends Controller
     }
 
     // Xác nhận đã nhận hàng (Member)
-    public function markAsDelivered(Request $request, $id)
+    public function markAsDelivered(Request $request, $order_code)
     {
         $userId = $request->user()->id;
-        $order = History::where('id_user', $userId)->where('id', $id)->first();
+        $order = History::where('id_user', $userId)->where('order_code', $order_code)->first();
 
         if (!$order || $order->status !== 1) {
             return response()->json(['error' => 'Đơn hàng không hợp lệ.'], 400);
         }
 
-        History::where('order_code', $order->order_code)->update(['status' => 2]);
+        History::where('order_code', $order_code)->update(['status' => 2]);
 
         return response()->json(['message' => 'Xác nhận đã nhận hàng thành công!']);
     }

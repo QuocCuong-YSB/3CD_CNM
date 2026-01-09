@@ -117,96 +117,90 @@ class ProductController extends Controller
 
     public function deleteMany(Request $request)
     {
-    try {
-        $ids = $request->input('ids');
+        try {
+            $ids = $request->input('ids');
 
-        if (!$ids || !is_array($ids)) {
+            if (!$ids || !is_array($ids)) {
+                return response()->json([
+                    'message' => 'Danh sách ID không hợp lệ!'
+                ], 400);
+            }
+
+            Product::whereIn('id', $ids)->delete();
+
             return response()->json([
-                'message' => 'Danh sách ID không hợp lệ!'
-            ], 400);
+                'message' => 'Xóa Product thành công !'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Lỗi server !',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        Product::whereIn('id', $ids)->delete();
-
-        return response()->json([
-            'message' => 'Xóa Product thành công !'
-        ], 200);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'message' => 'Lỗi server !',
-            'error' => $e->getMessage()
-        ], 500);
-    }
     }
 
     public function countTrashProduct()
     {
-    try {
-        $count = Product::onlyTrashed()->count();
+        try {
+            $count = Product::onlyTrashed()->count();
 
-        if ($count === 0) {
+            return response()->json($count, 200);
+
+        } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Danh sách trống!'
-            ], 404);
+                'message' => 'Lỗi server !',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        return response()->json($count, 200);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'message' => 'Lỗi server !',
-            'error' => $e->getMessage()
-        ], 500);
-    }
     }
 
     public function search(Request $request)
     {
-    try {
-        $name = $request->query('name');
-        $minPrice = $request->query('minPrice');
-        $maxPrice = $request->query('maxPrice');
-        $brand = $request->query('brand');
-        $category = $request->query('category');
+        try {
+            $name = $request->query('name');
+            $minPrice = $request->query('minPrice');
+            $maxPrice = $request->query('maxPrice');
+            $brand = $request->query('brand');
+            $category = $request->query('category');
 
-        $query = Product::with([
-            'brand:id,name',
-            'category:id,name'
-        ]);
+            $query = Product::with([
+                'brand:id,name',
+                'category:id,name'
+            ]);
 
-        if ($name) {
-            $query->where('name', 'LIKE', '%' . $name . '%');
+            if ($name) {
+                $query->where('name', 'LIKE', '%' . $name . '%');
+            }
+
+            if ($minPrice !== null && $maxPrice !== null) {
+                $query->whereBetween('price', [$minPrice, $maxPrice]);
+            } elseif ($minPrice !== null) {
+                $query->where('price', '>=', $minPrice);
+            } elseif ($maxPrice !== null) {
+                $query->where('price', '<=', $maxPrice);
+            }
+
+            if ($brand) {
+                $query->where('id_brand', $brand);
+            }
+
+            if ($category) {
+                $query->where('id_category', $category);
+            }
+
+            $products = $query->get();
+
+            return response()->json([
+                'data' => $products
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Lỗi server !',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        if ($minPrice !== null && $maxPrice !== null) {
-            $query->whereBetween('price', [$minPrice, $maxPrice]);
-        } elseif ($minPrice !== null) {
-            $query->where('price', '>=', $minPrice);
-        } elseif ($maxPrice !== null) {
-            $query->where('price', '<=', $maxPrice);
-        }
-
-        if ($brand) {
-            $query->where('id_brand', $brand);
-        }
-
-        if ($category) {
-            $query->where('id_category', $category);
-        }
-
-        $products = $query->get();
-
-        return response()->json([
-            'data' => $products
-        ], 200);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'message' => 'Lỗi server !',
-            'error' => $e->getMessage()
-        ], 500);
-    }
     }
 
 }

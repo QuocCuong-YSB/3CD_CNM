@@ -21,10 +21,10 @@ class OrderController extends Controller
     }
 
     // Cập nhật trạng thái đơn hàng (Admin)
-    public function updateStatus(Request $request, $id)
+    public function updateStatus(Request $request, $order_code)
     {
-        $order = History::find($id);
-        if (!$order) {
+        $exists = History::where('order_code', $order_code)->exists();
+        if (!$exists) {
             return response()->json(['error' => 'Đơn hàng không tồn tại.'], 404);
         }
 
@@ -32,8 +32,7 @@ class OrderController extends Controller
             'status' => 'required|integer|in:0,1,2,3'
         ]);
 
-        // Cập nhật trạng thái toàn bộ items trong cùng mã đơn hàng
-        History::where('order_code', $order->order_code)
+        History::where('order_code', $order_code)
             ->update(['status' => $request->status]);
 
         return response()->json(['message' => 'Cập nhật trạng thái thành công!']);
