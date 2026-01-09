@@ -22,6 +22,9 @@ function ProductDetail() {
     const [selectedImg, SetselectedImg] = useState([]);
     const dispatch = useDispatch();
 
+    const [canReview, setCanReview] = useState(false);
+    const [reviewMessage, setReviewMessage] = useState('');
+
     const [reviews, setReviews] = useState([]);
     const [filteredReviews, setFilteredReviews] = useState([]);
     const [filterType, setFilterType] = useState('all');
@@ -59,6 +62,43 @@ function ProductDetail() {
     }, [id]);
 
     useEffect(() => {
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            setCanReview(false);
+            setReviewMessage('Vui lòng đăng nhập để đánh giá sản phẩm');
+            return;
+        }
+
+        apiMember
+            .get(`/product/${id}/can-review`, {
+                headers: { Authorization: `Bearer ${token}` },
+            })
+            .then((res) => {
+                if (res.data.can_review) {
+                    setCanReview(true);
+                    setReviewMessage('');
+                } else {
+                    setCanReview(false);
+                    switch (res.data.reason) {
+                        case 'not_purchased':
+                            setReviewMessage('Bạn chưa mua sản phẩm này nên không thể đánh giá');
+                            break;
+                        case 'already_reviewed':
+                            setReviewMessage('Bạn đã đánh giá sản phẩm này rồi');
+                            break;
+                        default:
+                            setReviewMessage('Bạn không thể đánh giá sản phẩm này');
+                    }
+                }
+            })
+            .catch(() => {
+                setCanReview(false);
+                setReviewMessage('Không thể kiểm tra quyền đánh giá');
+            });
+    }, [id]);
+
+    useEffect(() => {
         if (filterType === 'all') {
             setFilteredReviews(reviews);
         } else if (filterType === 'image') {
@@ -92,7 +132,7 @@ function ProductDetail() {
     }
 
     function AddQuantity() {
-        const maxStock = input.quantity || input.quality || 0;
+        const maxStock = input.quantity || input.quantity || 0;
         if (quantity < maxStock) {
             SetQuantity((quantity) => quantity + 1);
         }
@@ -126,7 +166,7 @@ function ProductDetail() {
         apiMember.post(`/product/${id}/reviews`, {
             product_id: id,
             rating: currentRating,
-            comment: commentText
+            comment: commentText.toString(),
         }, config)
             .then((res) => {
                 toast.success('Đánh giá thành công!');
@@ -145,8 +185,8 @@ function ProductDetail() {
             })
             .catch((err) => {
                 console.error(err);
-                if (err.response?.status === 400 && err.response.data.error.includes('đã đánh giá')) {
-                    toast.error('Bạn đã đánh giá sản phẩm này rồi!');
+                if (err.response?.status === 403) {
+                    toast.error('Bạn cần mua sản phẩm trước khi đánh giá');
                 } else {
                     toast.error(err.response?.data?.error || 'Lỗi khi gửi đánh giá');
                 }
@@ -397,12 +437,14 @@ function ProductDetail() {
                                 <button
                                     className="btn btn-primary"
                                     style={{
-                                        background: '#d70018',
+                                        background: canReview ? '#d70018' : '#ccc',
                                         border: 'none',
                                         padding: '10px 30px',
                                         fontWeight: 'bold',
+                                        cursor: canReview ? 'pointer' : 'not-allowed',
                                     }}
-                                    onClick={() => setShowReviewForm(!showReviewForm)}
+                                    disabled={!canReview}
+                                    onClick={() => canReview && setShowReviewForm(!showReviewForm)}
                                 >
                                     Viết đánh giá
                                 </button>
@@ -460,6 +502,23 @@ function ProductDetail() {
                                 })}
                             </div>
                         </div>
+
+                        {!canReview && reviewMessage && (
+                            <div
+                                style={{
+                                    marginTop: '20px',
+                                    padding: '20px',
+                                    border: '1px dashed #d70018',
+                                    borderRadius: '8px',
+                                    background: '#fff5f5',
+                                    color: '#d70018',
+                                    fontWeight: 'bold',
+                                    textAlign: 'center',
+                                }}
+                            >
+                                {reviewMessage}
+                            </div>
+                        )}
 
                         {showReviewForm && (
                             <div

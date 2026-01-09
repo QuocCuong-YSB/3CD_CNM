@@ -2,14 +2,14 @@ import { useContext, useState, useEffect } from 'react';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useDispatch, useSelector } from 'react-redux';
-import { setSearch, resetCart } from '../../features/cart/Cart';
+import { useDispatch } from 'react-redux';
+import { setSearch } from '../../features/cart/Cart';
 import './Header.css';
 import apiMember from '../../API/apiMember';
 import MemberCartContext from '../../Context/MemberCartContext';
 
 function Header() {
-    const { SetCart } = useContext(MemberCartContext) || {};
+    const { cart, fetchCartCount, resetCart } = useContext(MemberCartContext);
     const navigate = useNavigate();
     const dispath = useDispatch();
     const [categories, setCategories] = useState([]);
@@ -27,7 +27,6 @@ function Header() {
             });
     }, []);
 
-    const totalCart = useSelector((state) => state.cart.total);
     const [keyword, setKeyword] = useState('');
     const [suggestions, setSuggestions] = useState([]);
 
@@ -88,6 +87,21 @@ function Header() {
         };
     }, []);
 
+    useEffect(() => {
+        const handleUserUpdate = () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                fetchCartCount && fetchCartCount();
+            }
+        };
+
+        window.addEventListener('user-updated', handleUserUpdate);
+
+        return () => {
+            window.removeEventListener('user-updated', handleUserUpdate);
+        };
+    }, []);
+
     function HandleCart() {
         navigate('/member/home/cart');
     }
@@ -108,8 +122,7 @@ function Header() {
                 localStorage.removeItem('tokenReferesh');
                 localStorage.removeItem('user');
                 localStorage.removeItem('IdUser');
-                SetCart && SetCart(0);
-                dispath(resetCart());
+                resetCart();
                 setUser(null);
                 navigate('/');
             });
@@ -157,7 +170,7 @@ function Header() {
                                                     let avatar = '';
                                                     try {
                                                         avatar = product.image[0];
-                                                    } catch (e) {}
+                                                    } catch (e) { }
 
                                                     return (
                                                         <li
@@ -185,7 +198,7 @@ function Header() {
                                 <div className="header-info-icons">
                                     <a href="#" onClick={() => HandleCart()}>
                                         <i className="fa fa-shopping-cart"></i>
-                                        <span>Giỏ hàng ({totalCart})</span>
+                                        <span>Giỏ hàng ({cart})</span>
                                     </a>
 
                                     {user ? (

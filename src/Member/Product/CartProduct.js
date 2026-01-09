@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
+import MemberCartContext from '../../Context/MemberCartContext';
 import apiMember from '../../API/apiMember';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -15,6 +16,9 @@ function formatPrice(price) {
 function CartProduct() {
     const [cartData, setCartData] = useState([]);
     const [totalAmount, setTotalAmount] = useState(0);
+    const [loadingId, setLoadingId] = useState(null);
+    const { fetchCartCount } = useContext(MemberCartContext);
+
     const navigate = useNavigate();
 
     const fetchCart = async () => {
@@ -34,7 +38,7 @@ function CartProduct() {
             });
 
             setTotalAmount(total);
-        } catch (err) {
+        } catch {
             toast.error('Không thể tải giỏ hàng');
         }
     };
@@ -44,30 +48,45 @@ function CartProduct() {
     }, []);
 
     const increaseQty = async (productId) => {
+        if (loadingId) return;
+        setLoadingId(productId);
         try {
             await apiMember.put(`/cart/product/${productId}`, { quantity: 1 });
-            fetchCart();
+            await fetchCart();
+            fetchCartCount && fetchCartCount();
         } catch (err) {
             toast.error(err.response?.data?.message);
+        } finally {
+            setLoadingId(null);
         }
     };
 
     const decreaseQty = async (productId) => {
+        if (loadingId) return;
+        setLoadingId(productId);
         try {
             await apiMember.put(`/cart/product/${productId}`, { quantity: -1 });
-            fetchCart();
+            await fetchCart();
+            fetchCartCount && fetchCartCount();
         } catch (err) {
             toast.error(err.response?.data?.message);
+        } finally {
+            setLoadingId(null);
         }
     };
 
     const removeItem = async (productId) => {
+        if (loadingId) return;
+        setLoadingId(productId);
         try {
             await apiMember.delete(`/cart/product/${productId}`);
             toast.success('Đã xóa sản phẩm khỏi giỏ hàng');
-            fetchCart();
+            await fetchCart();
+            fetchCartCount && fetchCartCount();
         } catch {
             toast.error('Xóa sản phẩm thất bại');
+        } finally {
+            setLoadingId(null);
         }
     };
 
@@ -83,7 +102,7 @@ function CartProduct() {
         if (!cartData.length) {
             return (
                 <tr>
-                    <td colSpan="5" style={{ textAlign: 'center', padding: 30 }}>
+                    <td colSpan="6" style={{ textAlign: 'center', padding: 30 }}>
                         Giỏ hàng trống
                     </td>
                 </tr>
@@ -118,11 +137,36 @@ function CartProduct() {
 
                     <td>{formatPrice(price)}</td>
 
+                    {/* CỘT KHO */}
+                    <td>{product.quantity}</td>
+
+                    {/* CỘT SỐ LƯỢNG */}
                     <td>
                         <div className="quantity-control">
-                            <button onClick={() => decreaseQty(product.id)}>−</button>
-                            <input value={item.quantity} readOnly />
-                            <button onClick={() => increaseQty(product.id)}>+</button>
+                            <button
+                                className="quantity-btn"
+                                disabled={item.quantity <= 1 || loadingId === product.id}
+                                onClick={() => decreaseQty(product.id)}
+                            >
+                                −
+                            </button>
+
+                            <input
+                                className="quantity-input"
+                                value={item.quantity}
+                                readOnly
+                            />
+
+                            <button
+                                className="quantity-btn"
+                                disabled={
+                                    item.quantity >= Number(product.quantity) ||
+                                    loadingId === product.id
+                                }
+                                onClick={() => increaseQty(product.id)}
+                            >
+                                +
+                            </button>
                         </div>
                     </td>
 
@@ -131,6 +175,7 @@ function CartProduct() {
                     <td>
                         <button
                             className="delete-btn"
+                            disabled={loadingId === product.id}
                             onClick={() => removeItem(product.id)}
                         >
                             ✕
@@ -151,6 +196,7 @@ function CartProduct() {
                     <tr>
                         <th>Sản phẩm</th>
                         <th>Giá</th>
+                        <th>Kho</th>
                         <th>Số lượng</th>
                         <th>Tổng</th>
                         <th>Xóa</th>

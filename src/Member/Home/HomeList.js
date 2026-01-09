@@ -22,6 +22,7 @@ function HomeList() {
     const [visibleCount, setVisibleCount] = useState(12);
     const [sliderIndex, setSliderIndex] = useState(0);
     const [sliderProducts, setSliderProducts] = useState([]);
+    const { fetchCartCount } = useContext(MemberCartContext);
 
     const { categoryId } = useParams();
     const location = useLocation();
@@ -122,6 +123,7 @@ function HomeList() {
             });
 
             dispath(addQuantityCart(product.id));
+            fetchCartCount && fetchCartCount();
 
             toast.success('Thêm sản phẩm vào giỏ hàng thành công');
         } catch (err) {
@@ -130,15 +132,14 @@ function HomeList() {
         }
     }
 
-
     function renderData() {
         if (!Array.isArray(input)) return null;
         const currentItems = input.slice(0, visibleCount);
 
         return currentItems.map((value, index) => {
-            const avatar = Array.isArray(value.image) && value.image.length > 0 
-                ? value.image 
-                : ['default.png']; 
+            const avatar = Array.isArray(value.image) && value.image.length > 0
+                ? value.image
+                : ['default.png'];
 
             const is_on_sale = value.sale > 0;
             const original_price = value.price;
@@ -152,9 +153,9 @@ function HomeList() {
 
                         <Link to={`/member/home/product/detail/${value.id}`}>
                             <div className="product-image">
-                                <img 
-                                    src={`http://localhost:8000/${avatar[0]}`} 
-                                    alt={value.name || 'Product'} 
+                                <img
+                                    src={`http://localhost:8000/${avatar[0]}`}
+                                    alt={value.name || 'Product'}
                                     onError={(e) => { e.target.src = '/images/default.png'; }}
                                 />
                             </div>
@@ -192,68 +193,68 @@ function HomeList() {
     }
 
     function renderHeroSlider() {
-    if (!Array.isArray(sliderProducts)) return null;
+        if (!Array.isArray(sliderProducts)) return null;
 
-    const saleProducts = sliderProducts
-        .filter((p) => p.sale > 0)
-        .sort((a, b) => b.sale - a.sale)
-        .slice(0, 6);
+        const saleProducts = sliderProducts
+            .filter((p) => p.sale > 0)
+            .sort((a, b) => b.sale - a.sale)
+            .slice(0, 6);
 
-    if (saleProducts.length === 0) return null;
+        if (saleProducts.length === 0) return null;
 
-    return (
-        <div className="hero-slider-container">
-            {saleProducts.map((value, index) => {
+        return (
+            <div className="hero-slider-container">
+                {saleProducts.map((value, index) => {
 
-                const avatar = Array.isArray(value.image) && value.image.length > 0
-                    ? value.image
-                    : ['default.png'];
+                    const avatar = Array.isArray(value.image) && value.image.length > 0
+                        ? value.image
+                        : ['default.png'];
 
-                const is_on_sale = value.sale > 0;
-                const original_price = value.price || 0;
-                const sale_percent = value.sale || 0;
-                const new_price = is_on_sale 
-                    ? original_price * (1 - sale_percent / 100) 
-                    : original_price;
+                    const is_on_sale = value.sale > 0;
+                    const original_price = value.price || 0;
+                    const sale_percent = value.sale || 0;
+                    const new_price = is_on_sale
+                        ? original_price * (1 - sale_percent / 100)
+                        : original_price;
 
-                let positionClass = 'card-hidden';
-                const diff = (index - sliderIndex + 6) % 6;
+                    let positionClass = 'card-hidden';
+                    const diff = (index - sliderIndex + 6) % 6;
 
-                if (diff === 0) positionClass = 'card-center';
-                else if (diff === 1) positionClass = 'card-right';
-                else if (diff === 2) positionClass = 'card-far-right';
-                else if (diff === 5) positionClass = 'card-left';
-                else if (diff === 4) positionClass = 'card-far-left';
+                    if (diff === 0) positionClass = 'card-center';
+                    else if (diff === 1) positionClass = 'card-right';
+                    else if (diff === 2) positionClass = 'card-far-right';
+                    else if (diff === 5) positionClass = 'card-left';
+                    else if (diff === 4) positionClass = 'card-far-left';
 
-                return (
-                    <div className={`hero-product-card ${positionClass}`} key={index}>
-                        {is_on_sale && <div className="sale-badge">-{sale_percent}%</div>}
+                    return (
+                        <div className={`hero-product-card ${positionClass}`} key={index}>
+                            {is_on_sale && <div className="sale-badge">-{sale_percent}%</div>}
 
-                        <Link to={`/member/home/product/detail/${value.id}`}>
-                            <div className="product-image">
-                                <img
-                                    src={`http://localhost:8000/${avatar[0]}`}
-                                    alt={value.name || 'Product'}
-                                    onError={(e) => { e.target.src = '/images/default.png'; }}
-                                />
-                            </div>
-                        </Link>
-
-                        <div className="product-info">
-                            <Link to={`/member/home/product/detail/${value.id}`} className="product-name">
-                                {value.name || 'Unknown Product'}
+                            <Link to={`/member/home/product/detail/${value.id}`}>
+                                <div className="product-image">
+                                    <img
+                                        src={`http://localhost:8000/${avatar[0]}`}
+                                        alt={value.name || 'Product'}
+                                        onError={(e) => { e.target.src = '/images/default.png'; }}
+                                    />
+                                </div>
                             </Link>
-                            <div className="price-container">
-                                <span className="price-new">{formatPrice(new_price)}</span>
-                                <span className="price-old">{formatPrice(original_price)}</span>
+
+                            <div className="product-info">
+                                <Link to={`/member/home/product/detail/${value.id}`} className="product-name">
+                                    {value.name || 'Unknown Product'}
+                                </Link>
+                                <div className="price-container">
+                                    <span className="price-new">{formatPrice(new_price)}</span>
+                                    <span className="price-old">{formatPrice(original_price)}</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                );
-            })}
-        </div>
-    );
-}
+                    );
+                })}
+            </div>
+        );
+    }
 
     return (
         <div>
