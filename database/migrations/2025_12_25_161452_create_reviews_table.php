@@ -13,7 +13,8 @@ class CreateReviewsTable extends Migration
 
             $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->string('order_code')->nullable();
+            
+            $table->string('order_code');
             $table->foreign('order_code')->references('order_code')->on('histories')->cascadeOnDelete();
 
             $table->tinyInteger('rating'); // 1-5

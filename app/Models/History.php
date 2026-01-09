@@ -10,6 +10,8 @@ class History extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $table = 'histories';
+
     protected $fillable = [
         'id_user',
         'id_product',
@@ -22,6 +24,18 @@ class History extends Model
         'note',
     ];
 
+    protected $casts = [
+        'status' => 'integer',
+        'price'  => 'float',
+        'quantity' => 'integer',
+    ];
+
+    const STATUS_NEW        = 0;
+    const STATUS_PAID       = 1;
+    const STATUS_SHIPPING   = 2;
+    const STATUS_COMPLETED  = 3; 
+    const STATUS_CANCELLED  = 4;
+
     public function user()
     {
         return $this->belongsTo(User::class, 'id_user');
@@ -32,8 +46,30 @@ class History extends Model
         return $this->belongsTo(Product::class, 'id_product');
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'order_code', 'order_code');
+    }
+
     public static function generateOrderCode()
     {
         return 'ORD-' . strtoupper(uniqid());
+    }
+
+    public static function hasCompletedPurchase($userId, $productId)
+    {
+        return self::where('id_user', $userId)
+            ->where('id_product', $productId)
+            ->where('status', self::STATUS_COMPLETED)
+            ->exists();
+    }
+
+    public static function getCompletedOrder($userId, $productId)
+    {
+        return self::where('id_user', $userId)
+            ->where('id_product', $productId)
+            ->where('status', self::STATUS_COMPLETED)
+            ->latest()
+            ->first();
     }
 }

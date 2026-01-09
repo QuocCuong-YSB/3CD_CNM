@@ -29,7 +29,7 @@ class Review extends Model
 
     public function order()
     {
-        return $this->belongsTo(History::class);
+        return $this->belongsTo(History::class, 'order_code', 'order_code');
     }
 
     public static function addReview(array $data)
