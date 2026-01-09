@@ -31,10 +31,9 @@ class History extends Model
     ];
 
     const STATUS_NEW        = 0;
-    const STATUS_PAID       = 1;
-    const STATUS_SHIPPING   = 2;
-    const STATUS_COMPLETED  = 3; 
-    const STATUS_CANCELLED  = 4;
+    const STATUS_SHIPPING   = 1;
+    const STATUS_COMPLETED  = 2; 
+    const STATUS_CANCELLED  = 3;
 
     public function user()
     {
