@@ -30,6 +30,8 @@ function CheckOut() {
         },
     };
 
+    const { fetchCartCount } = useContext(MemberCartContext);
+
     const navigate = useNavigate();
     const cart = useSelector((state) => state.cart.items);
     const dispatch = useDispatch();
@@ -180,6 +182,7 @@ function CheckOut() {
             const res = await apiMember.post('/order', orderData, config);
             toast.success(`Đặt hàng (${paymentSource}) thành công!`);
             dispatch(resetCart());
+            await fetchCartCount();
             navigate('/member/home');
             return res;
         } catch (error) {
