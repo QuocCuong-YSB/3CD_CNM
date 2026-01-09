@@ -79,6 +79,7 @@ Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:0'])->prefix
 
     // Member Carts
     Route::get('/cart', [CartController::class, 'index']);
+    Route::get('/cart/count', [CartController::class, 'count']);
     Route::post('/cart', [CartController::class, 'store']);
     Route::put('/cart/product/{product_id}', [CartController::class, 'update']);
     Route::delete('/cart/product/{product_id}', [CartController::class, 'destroy']);
