@@ -90,6 +90,7 @@ Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:0'])->prefix
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // Review Products
+    Route::get('/product/{id}/can-review', [ReviewController::class, 'canReview']);
     Route::post('/product/{id}/reviews', [ReviewController::class, 'store']);
 });
 Route::middleware(['auth:sanctum'])->group(function () {
