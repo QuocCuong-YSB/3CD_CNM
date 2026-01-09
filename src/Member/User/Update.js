@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import apiMember from '../../API/apiMember';
 import { toast } from 'react-toastify';
-import refershToken from '../../RefershToken/RefershToken';
 import './Update.css';
 import Breadcrumb from '../../component/Member/Breadcrumb';
 
@@ -14,19 +13,19 @@ function UpdateMember() {
         address: '',
         country: '',
         avatar_render: [],
-        avatar: [],
+        avatar_old: [],
+        avatar_new: [],
     });
     let [country, SetCountry] = useState([]);
     let [err, SetErr] = useState({});
-    let config = {
-        headers: {
-            Accept: 'application/json',
-        },
-    };
+
     function handleChangInputFile(e) {
         let files = Array.from(e.target.files);
-        let name = e.target.name;
-        SetInput((states) => ({ ...states, [name]: files }));
+        SetInput((states) => ({
+            ...states,
+            avatar_new: files,
+            avatar_render: files
+        }));
     }
 
     useEffect(() => {
@@ -38,6 +37,7 @@ function UpdateMember() {
             .catch((errors) => console.log(errors));
         getDataUser();
     }, []);
+
     function getDataUser() {
         apiMember.get('/user').then((res) => {
             let user = res.data.data;
@@ -61,17 +61,31 @@ function UpdateMember() {
                 phone: user.phone,
                 address: user.address,
                 country: user.id_country,
-                avatar: avatarData,
+                avatar_old: avatarData,
+                avatar_new: [],
                 avatar_render: avatarData,
             });
         });
     }
+
     function changInput(e) {
         const name = e.target.name;
         const value = e.target.value;
         SetInput((states) => ({ ...states, [name]: value }));
     }
+
     function renderImage() {
+        if (input.avatar_new.length > 0) {
+            return input.avatar_new.map((file, index) => {
+                const imgSrc = URL.createObjectURL(file);
+                return (
+                    <div key={index} className="avatar_list">
+                        <img src={imgSrc} alt="avatar"></img>
+                    </div>
+                );
+            });
+        }
+
         return input.avatar_render.map((value, index) => {
             const imgSrc = value.startsWith('http') ? value : `http://localhost:8000/${value}`;
             return (
@@ -81,12 +95,14 @@ function UpdateMember() {
             );
         });
     }
+
     function checkInput(e) {
         e.preventDefault();
         const phoneRegex = /^(0|\+84)[0-9]{9}$/;
         let allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
         let errAll = {};
         let check = true;
+
         if (input.name == '') {
             errAll.name = 'Vui lòng nhập name';
             check = false;
@@ -112,29 +128,25 @@ function UpdateMember() {
             errAll.country = 'Vui lòng chọn country';
             check = false;
         }
-        if (input.avatar.length <= 0) {
-            errAll.file = 'Vui lòng chọn files';
-            check = false;
+        if (input.avatar_new.length > 0) {
+            if (input.avatar_new.length > 3) {
+                errAll.file = 'Chỉ chọn được tối đa 3 files';
+                check = false;
+            } else {
+                input.avatar_new.forEach((file) => {
+                    if (file.size > 1024 * 1024) {
+                        errAll.file = 'Vui lòng chọn ảnh nhỏ hơn 1mb';
+                        check = false;
+                    }
+
+                    if (!allowedTypes.includes(file.type)) {
+                        errAll.file = 'Vui lòng chọn đúng định dạng files';
+                        check = false;
+                    }
+                });
+            }
         }
 
-        if (input.avatar.length > 3) {
-            errAll.file = 'Chỉ chọn được tối đa 3 files';
-            check = false;
-        } else {
-            input.avatar.map((value, index) => {
-                console.log('File type:', value.type);
-
-                if (value.size > 1024 * 1024) {
-                    errAll.file = 'Vui lòng chọn ảnh nhỏ hơn 1mb';
-                    check = false;
-                }
-
-                if (!allowedTypes.includes(value.type)) {
-                    errAll.file = 'Vui lòng chọn đúng định dạng files';
-                    check = false;
-                }
-            });
-        }
         if (!check) {
             SetErr(errAll);
         } else {
@@ -144,11 +156,14 @@ function UpdateMember() {
             data.append('phone', input.phone);
             data.append('address', input.address);
             data.append('id_country', input.country);
-            input.avatar.map((value, index) => {
-                data.append('avatar[]', value);
-            });
+            if (input.avatar_new.length > 0) {
+                input.avatar_new.forEach((file) => {
+                    data.append('avatar[]', file);
+                });
+            }
+
             apiMember
-                .post('/user', data, config)
+                .post('/user', data)
                 .then((res) => {
                     SetErr({});
                     console.log(res);
@@ -193,6 +208,7 @@ function UpdateMember() {
                 });
         }
     }
+
     return (
         <div>
             <Breadcrumb
