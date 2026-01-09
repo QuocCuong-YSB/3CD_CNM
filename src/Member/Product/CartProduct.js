@@ -93,7 +93,8 @@ function CartProduct() {
         }
     };
 
-    const handleCheckout = () => {
+    const handleCheckout = (e) => {
+        e.preventDefault();
         if (!cartData.length) {
             toast.warn('Giỏ hàng đang trống');
             return;
@@ -119,10 +120,11 @@ function CartProduct() {
                     ? product.image[0]
                     : 'default.png';
 
-            const price =
-                product.sale > 0
-                    ? product.price * (1 - product.sale / 100)
-                    : product.price;
+            const is_on_sale = product.sale > 0;
+            const original_price = product.price;
+            const new_price = is_on_sale
+                ? original_price * (1 - product.sale / 100)
+                : original_price;
 
             return (
                 <tr key={product.id}>
@@ -138,7 +140,25 @@ function CartProduct() {
                         </div>
                     </td>
 
-                    <td>{formatPrice(price)}</td>
+                    <td>
+                        {is_on_sale ? (
+                            <>
+                                <p style={{ color: '#d9534f' }}>{formatPrice(new_price)}</p>
+                                <p
+                                    style={{
+                                        textDecoration: 'line-through',
+                                        fontSize: '12px',
+                                        color: '#999',
+                                    }}
+                                >
+                                    {formatPrice(original_price)}
+                                </p>
+                            </>
+                        ) : (
+                            <p>{formatPrice(original_price)}</p>
+                        )}
+                    </td>
+
                     <td>{product.quantity}</td>
 
                     <td>
@@ -170,26 +190,29 @@ function CartProduct() {
                         </div>
                     </td>
 
-                    <td>{formatPrice(price * item.quantity)}</td>
+                    <td>{formatPrice(new_price * item.quantity)}</td>
 
                     <td>
-                        <button
+                        <a
                             className="delete-btn"
                             disabled={loadingId === product.id}
                             onClick={() => removeItem(product.id)}
                         >
-                            ✕
-                        </button>
+                            <i className="fa fa-times" />
+                        </a>
                     </td>
                 </tr>
             );
         });
     };
 
+    const ecoTax = cartData.length ? 2 : 0;
+    const finalTotal = cartData.length ? totalAmount + ecoTax : 0;
+
     return (
         <section id="cart_items_new">
             <Breadcrumb items={[{ label: 'Giỏ hàng' }]} />
-            <h2 className="cart_title">Giỏ Hàng</h2>
+            <h2 className="cart_title">Giỏ Hàng Của Bạn</h2>
 
             <table className="cart-table">
                 <thead>
@@ -205,22 +228,30 @@ function CartProduct() {
                 <tbody>{renderCart()}</tbody>
             </table>
 
-            <div className="cart-total-box">
-                <ul>
-                    <li>
-                        Tạm tính <span>{formatPrice(totalAmount)}</span>
-                    </li>
-                    <li>
-                        Phí vận chuyển <span>Free</span>
-                    </li>
-                    <li className="total">
-                        Tổng cộng <span>{formatPrice(totalAmount)}</span>
-                    </li>
-                </ul>
+            <div className="row">
+                <div className="col-md-5 pull-right">
+                    <div className="cart-total-box">
+                        <h3>TỔNG CỘNG</h3>
+                        <ul>
+                            <li>
+                                Tạm tính <span>{formatPrice(totalAmount)}</span>
+                            </li>
+                            <li>
+                                Eco Tax <span>{formatPrice(ecoTax)}</span>
+                            </li>
+                            <li>
+                                Phí vận chuyển <span>Free</span>
+                            </li>
+                            <li className="total">
+                                Tổng cộng <span>{formatPrice(finalTotal)}</span>
+                            </li>
+                        </ul>
 
-                <button className="checkout-btn" onClick={handleCheckout}>
-                    Thanh toán
-                </button>
+                        <a href="#" className="checkout-btn" onClick={handleCheckout}>
+                            Tiến hành thanh toán
+                        </a>
+                    </div>
+                </div>
             </div>
         </section>
     );
