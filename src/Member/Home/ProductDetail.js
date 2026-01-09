@@ -6,6 +6,7 @@ import apiMember from '../../API/apiMember';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import Breadcrumb from '../../component/Member/Breadcrumb';
+import MemberCartContext from '../../Context/MemberCartContext';
 
 function formatPrice(price) {
     if (!price) return '';
@@ -21,6 +22,8 @@ function ProductDetail() {
     const [quantity, SetQuantity] = useState(1);
     const [selectedImg, SetselectedImg] = useState([]);
     const dispatch = useDispatch();
+
+    const { fetchCartCount } = useContext(MemberCartContext);
 
     const [canReview, setCanReview] = useState(false);
     const [reviewMessage, setReviewMessage] = useState('');
@@ -135,6 +138,7 @@ function ProductDetail() {
 
             dispatch(addToCart({ id, qty: quantity }));
             toast.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng`);
+            await fetchCartCount();
         } catch (err) {
             console.error(err.response?.data || err.message);
             toast.error('Thêm sản phẩm vào giỏ thất bại');
