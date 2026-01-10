@@ -38,7 +38,7 @@ function ProductList() {
             .get(`/product?page=${currentPage}&limit=8`)
             .then((res) => {
                 setData(res.data.data);
-                setTotalPages(res.data.totalPages);
+                setTotalPages(res.data.last_page);
             })
             .catch((err) => console.log(err));
     };

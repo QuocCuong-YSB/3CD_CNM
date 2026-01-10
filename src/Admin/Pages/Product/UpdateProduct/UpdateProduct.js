@@ -26,8 +26,8 @@ function UpdateProduct() {
     useEffect(() => {
         if (data) {
             setName(data.name || '');
-            setCategory(data.id_category?.id || '');
-            setBrand(data.id_brand?.id || '');
+            setCategory(data.id_category || '');
+            setBrand(data.id_brand || '');
             setPrice(data.price || 0);
             setSale(data.sale || 0);
             setQuality(data.quantity || 0);
