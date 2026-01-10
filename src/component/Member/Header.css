@@ -7,7 +7,6 @@
     z-index: 1000;
 }
 
-
 .header-main .logo-container {
     display: flex;
     align-items: center;
@@ -91,12 +90,14 @@
     align-items: center;
     justify-content: center;
     font-weight: 500;
-    height: 60px;
-    width: 80px;
+    height: auto;
+    min-height: 60px;
+    padding: 0 10px;
+    min-width: 80px;
 }
 
 .header-main .header-info-icons a:hover {
-    color: var(--primary-color);
+    color: var(--primary-color) !important;
 }
 
 .header-main .header-info-icons a i {

@@ -6,6 +6,7 @@ import MemberCartContext from '../../Context/MemberCartContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { addQuantityCart } from '../../features/cart/Cart';
 import { toast } from 'react-toastify';
+import Loading from '../../component/Loading';
 
 function formatPrice(price) {
     if (!price) return '';
@@ -22,6 +23,7 @@ function HomeList() {
     const [visibleCount, setVisibleCount] = useState(12);
     const [sliderIndex, setSliderIndex] = useState(0);
     const [sliderProducts, setSliderProducts] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     const { fetchCartCount } = useContext(MemberCartContext);
 
     const { categoryId } = useParams();
@@ -63,6 +65,9 @@ function HomeList() {
                 .catch((err) => {
                     console.error(err);
                     SetInput([]);
+                })
+                .finally(() => {
+                    setIsLoading(false);
                 });
         };
 
@@ -75,8 +80,10 @@ function HomeList() {
         if (search) {
             fetchFilteredProducts({ name: search });
         } else if (categoryId) {
+            setIsLoading(true);
             fetchFilteredProducts({ category: categoryId });
         } else {
+            setIsLoading(true);
             apiMember
                 .get('/product')
                 .then((res) => {
@@ -87,6 +94,9 @@ function HomeList() {
                 .catch((err) => {
                     console.log(err);
                     SetInput([]);
+                })
+                .finally(() => {
+                    setIsLoading(false);
                 });
         }
 
@@ -100,8 +110,14 @@ function HomeList() {
         };
     }, [categoryId, search, location.pathname]);
 
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+
     const handleLoadMore = () => {
-        setVisibleCount((prev) => prev + 12);
+        setIsLoadingMore(true);
+        setTimeout(() => {
+            setVisibleCount((prev) => prev + 12);
+            setIsLoadingMore(false);
+        }, 800);
     };
 
     async function AddCart(product) {
@@ -134,6 +150,16 @@ function HomeList() {
 
     function renderData() {
         if (!Array.isArray(input)) return null;
+
+        if (input.length === 0) {
+            return (
+                <div className="no-products-message">
+                    <i className="fa fa-search"></i>
+                    <p>Rất tiếc, chúng tôi không tìm thấy sản phẩm nào phù hợp với yêu cầu của bạn.</p>
+                </div>
+            );
+        }
+
         const currentItems = input.slice(0, visibleCount);
 
         return currentItems.map((value, index) => {
@@ -258,6 +284,7 @@ function HomeList() {
 
     return (
         <div>
+            {isLoading && <Loading />}
             <div className="hero-section">{renderHeroSlider()}</div>
 
             <div className="features_items" id="products-grid">
@@ -270,14 +297,17 @@ function HomeList() {
                 <div style={{ textAlign: 'center', width: '100%', marginTop: '20px', clear: 'both' }}>
                     <button
                         onClick={handleLoadMore}
-                        className="btn btn-default"
-                        style={{
-                            fontSize: '18px',
-                            fontWeight: 'bold',
-                            padding: '10px 25px',
-                        }}
+                        className="load-more-btn"
+                        disabled={isLoadingMore}
                     >
-                        Hiển thị thêm sản phẩm
+                        {isLoadingMore ? (
+                            <>
+                                <i className="fa fa-spinner fa-spin" style={{ marginRight: '10px' }}></i>
+                                ĐANG TẢI...
+                            </>
+                        ) : (
+                            'Hiển thị thêm sản phẩm'
+                        )}
                     </button>
                 </div>
             )}

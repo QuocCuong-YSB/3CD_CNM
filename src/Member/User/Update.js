@@ -3,6 +3,7 @@ import apiMember from '../../API/apiMember';
 import { toast } from 'react-toastify';
 import './Update.css';
 import Breadcrumb from '../../component/Member/Breadcrumb';
+import Loading from '../../component/Loading';
 
 function UpdateMember() {
     let [input, SetInput] = useState({
@@ -18,6 +19,7 @@ function UpdateMember() {
     });
     let [country, SetCountry] = useState([]);
     let [err, SetErr] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
 
     function handleChangInputFile(e) {
         let files = Array.from(e.target.files);
@@ -29,17 +31,23 @@ function UpdateMember() {
     }
 
     useEffect(() => {
-        apiMember
-            .get('/country')
-            .then((res) => {
-                SetCountry(res.data);
-            })
-            .catch((errors) => console.log(errors));
-        getDataUser();
+        const fetchData = async () => {
+            setIsLoading(true);
+            try {
+                const countryRes = await apiMember.get('/country');
+                SetCountry(countryRes.data);
+                await getDataUser();
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchData();
     }, []);
 
     function getDataUser() {
-        apiMember.get('/user').then((res) => {
+        return apiMember.get('/user').then((res) => {
             let user = res.data.data;
             let avatarData = [];
 
@@ -211,6 +219,7 @@ function UpdateMember() {
 
     return (
         <div>
+            {isLoading && <Loading />}
             <Breadcrumb
                 items={[{ label: 'Tài Khoản', path: '/member/account/update' }, { label: 'Cập nhật thông tin' }]}
             />

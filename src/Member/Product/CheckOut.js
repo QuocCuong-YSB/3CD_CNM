@@ -160,18 +160,24 @@ function CheckOut() {
             return Promise.reject('Missing user ID');
         }
 
-        if (Object.keys(cart).length === 0) {
+        if (inputProducts.length === 0) {
             toast.warn('Vui lòng thêm sản phẩm vào giỏ hàng');
             return Promise.reject('Giỏ hàng rỗng');
         }
+
         if (!formData.name || !formData.address || !formData.phone || !formData.email) {
             toast.error('Vui lòng điền đầy đủ thông tin mua hàng.');
             return Promise.reject('Thiếu thông tin');
         }
 
+        const cartForOrder = {};
+        inputProducts.forEach(item => {
+            cartForOrder[item.product.id] = item.quantity;
+        });
+
         const orderData = {
             user: { ...user, ...formData, note },
-            cart,
+            cart: cartForOrder,
             paymentMethod: paymentMethod,
             voucherCode: voucherApplied ? 'NEWUSER' : null,
         };

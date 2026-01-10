@@ -196,7 +196,7 @@
     transform: rotate(15deg) scale(1.1);
 }
 
-/* Sidebar Box */
+/* Sidebar box */
 .cart-sidebar {
     width: 380px;
     position: sticky;
@@ -291,6 +291,7 @@
     filter: brightness(115%);
     transform: translateY(-3px);
     box-shadow: 0 10px 20px rgba(44, 62, 80, 0.2);
+    color: white !important;
 }
 
 .continue-shopping {
@@ -311,7 +312,7 @@
     letter-spacing: 0.5px;
 }
 
-/* Empty Cart State */
+/* Empty cart state */
 .empty-cart-container {
     text-align: center;
     padding: 80px 40px;
@@ -358,7 +359,7 @@
     box-shadow: 0 10px 25px rgba(44, 62, 80, 0.15);
 }
 
-/* Mobile Responsive */
+/* Mobile responsive */
 @media (max-width: 1024px) {
     .cart-content-wrapper {
         flex-direction: column;

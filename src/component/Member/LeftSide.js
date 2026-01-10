@@ -222,41 +222,6 @@ function LeftSide() {
                     </div>
                 </div>
 
-                {/* Categories */}
-                <div className="brands_products">
-                    <h2>DANH MỤC</h2>
-                    <div className="brands-name">
-                        <ul className="nav nav-pills nav-stacked">
-                            <li>
-                                <a
-                                    href="#"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        handleCategoryClick('');
-                                    }}
-                                    className={filters.category === '' ? 'active-filter' : ''}
-                                >
-                                    Tất cả danh mục
-                                </a>
-                            </li>
-                            {categories.map((cat) => (
-                                <li key={cat.id}>
-                                    <a
-                                        href="#"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            handleCategoryClick(cat.id);
-                                        }}
-                                        className={filters.category === cat.id ? 'active-filter' : ''}
-                                    >
-                                        {cat.name}
-                                    </a>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
-
                 {/* Brands */}
                 <div className="brands_products" style={{ marginTop: '20px' }}>
                     <h2>THƯƠNG HIỆU</h2>

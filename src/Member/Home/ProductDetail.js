@@ -7,6 +7,7 @@ import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import Breadcrumb from '../../component/Member/Breadcrumb';
 import MemberCartContext from '../../Context/MemberCartContext';
+import Loading from '../../component/Loading';
 
 function formatPrice(price) {
     if (!price) return '';
@@ -23,6 +24,7 @@ function ProductDetail() {
     const [selectedImg, SetselectedImg] = useState([]);
     const dispatch = useDispatch();
 
+    const [isPageLoading, setIsPageLoading] = useState(true);
     const { fetchCartCount } = useContext(MemberCartContext);
 
     const [canReview, setCanReview] = useState(false);
@@ -41,8 +43,12 @@ function ProductDetail() {
     const [showReviewForm, setShowReviewForm] = useState(false);
 
     useEffect(() => {
-        apiMember.get('/product/show/' + id).then((res) => {
-            const productData = res.data;
+        setIsPageLoading(true);
+        Promise.all([
+            apiMember.get('/product/show/' + id),
+            apiMember.get(`/product/${id}/reviews`)
+        ]).then(([productRes, reviewsRes]) => {
+            const productData = productRes.data;
             SetInput(productData);
             if (productData?.image) {
                 let avatar = [];
@@ -53,18 +59,15 @@ function ProductDetail() {
                 }
                 SetselectedImg(avatar[0]);
             }
+
+            const reviewsData = Array.isArray(reviewsRes.data.data) ? reviewsRes.data.data : [];
+            setReviews(reviewsData);
+            setFilteredReviews(reviewsData);
+        }).catch((err) => {
+            console.error(err);
+        }).finally(() => {
+            setIsPageLoading(false);
         });
-
-        apiMember
-            .get(`/product/${id}/reviews`)
-            .then((res) => {
-                const data = Array.isArray(res.data.data) ? res.data.data : [];
-                console.log(data);
-
-                setReviews(data);
-                setFilteredReviews(data);
-            })
-            .catch((err) => console.log(err));
     }, [id]);
 
     useEffect(() => {
@@ -366,6 +369,7 @@ function ProductDetail() {
 
     return (
         <div>
+            {isPageLoading && <Loading />}
             {input.name && (
                 <Breadcrumb
                     items={[

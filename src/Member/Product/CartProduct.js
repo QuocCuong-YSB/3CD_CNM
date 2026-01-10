@@ -4,6 +4,7 @@ import apiMember from '../../API/apiMember';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Breadcrumb from '../../component/Member/Breadcrumb';
+import Loading from '../../component/Loading';
 import './CartProduct.css';
 
 function formatPrice(price) {
@@ -17,11 +18,13 @@ function CartProduct() {
     const [cartData, setCartData] = useState([]);
     const [totalAmount, setTotalAmount] = useState(0);
     const [loadingId, setLoadingId] = useState(null);
+    const [isPageLoading, setIsPageLoading] = useState(true);
 
     const { fetchCartCount } = useContext(MemberCartContext);
     const navigate = useNavigate();
 
-    const fetchCart = async () => {
+    const fetchCart = async (showLoading = false) => {
+        if (showLoading) setIsPageLoading(true);
         try {
             const res = await apiMember.get('/cart');
             const carts = Array.isArray(res.data.data) ? res.data.data : [];
@@ -40,11 +43,13 @@ function CartProduct() {
             setTotalAmount(total);
         } catch {
             toast.error('Không thể tải giỏ hàng');
+        } finally {
+            if (showLoading) setIsPageLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchCart();
+        fetchCart(true);
     }, []);
 
     const increaseQty = async (productId) => {
@@ -210,46 +215,49 @@ function CartProduct() {
     const finalTotal = cartData.length ? totalAmount + ecoTax : 0;
 
     return (
-        <section id="cart_items_new">
-            <Breadcrumb items={[{ label: 'Giỏ hàng' }]} />
-            <h2 className="cart_title">Giỏ Hàng Của Bạn</h2>
+        <section className="cart-product-page">
+            {isPageLoading && <Loading />}
+            <div className="container">
+                <Breadcrumb items={[{ label: 'Giỏ hàng' }]} />
+                <h2 className="cart_title">Giỏ Hàng Của Bạn</h2>
 
-            <table className="cart-table">
-                <thead>
-                    <tr>
-                        <th>Sản phẩm</th>
-                        <th>Giá</th>
-                        <th>Kho</th>
-                        <th>Số lượng</th>
-                        <th>Tổng</th>
-                        <th>Xóa</th>
-                    </tr>
-                </thead>
-                <tbody>{renderCart()}</tbody>
-            </table>
+                <table className="cart-table">
+                    <thead>
+                        <tr>
+                            <th>Sản phẩm</th>
+                            <th>Giá</th>
+                            <th>Kho</th>
+                            <th>Số lượng</th>
+                            <th>Tổng</th>
+                            <th>Xóa</th>
+                        </tr>
+                    </thead>
+                    <tbody>{renderCart()}</tbody>
+                </table>
 
-            <div className="row">
-                <div className="col-md-5 pull-right">
-                    <div className="cart-total-box">
-                        <h3>TỔNG CỘNG</h3>
-                        <ul>
-                            <li>
-                                Tạm tính <span>{formatPrice(totalAmount)}</span>
-                            </li>
-                            <li>
-                                Eco Tax <span>{formatPrice(ecoTax)}</span>
-                            </li>
-                            <li>
-                                Phí vận chuyển <span>Free</span>
-                            </li>
-                            <li className="total">
-                                Tổng cộng <span>{formatPrice(finalTotal)}</span>
-                            </li>
-                        </ul>
+                <div className="row">
+                    <div className="col-md-5 pull-right">
+                        <div className="cart-total-box">
+                            <h3>TỔNG CỘNG</h3>
+                            <ul>
+                                <li>
+                                    Tạm tính <span>{formatPrice(totalAmount)}</span>
+                                </li>
+                                <li>
+                                    Eco Tax <span>{formatPrice(ecoTax)}</span>
+                                </li>
+                                <li>
+                                    Phí vận chuyển <span>Free</span>
+                                </li>
+                                <li className="total">
+                                    Tổng cộng <span>{formatPrice(finalTotal)}</span>
+                                </li>
+                            </ul>
 
-                        <a href="#" className="checkout-btn" onClick={handleCheckout}>
-                            Tiến hành thanh toán
-                        </a>
+                            <a href="#" className="checkout-btn" onClick={handleCheckout}>
+                                Tiến hành thanh toán
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

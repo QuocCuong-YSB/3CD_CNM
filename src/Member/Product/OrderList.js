@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { confirmDialog } from '../../component/confirmDialog';
 import './OrderList.css';
 import Breadcrumb from '../../component/Member/Breadcrumb';
+import Loading from '../../component/Loading';
 
 function formatPrice(price) {
     if (!price) return '';
@@ -33,6 +34,7 @@ function OrderList() {
     const [orders, setOrders] = useState([]);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [activeTab, setActiveTab] = useState('waiting');
+    const [isLoading, setIsLoading] = useState(true);
 
     let config = {
         headers: {
@@ -43,6 +45,7 @@ function OrderList() {
     };
 
     const getOrders = async () => {
+        setIsLoading(true);
         try {
             const res = await apiMember.get(`/order/user/${idUser}`, config);
             setOrders(Array.isArray(res.data.data) ? res.data.data : []);
@@ -72,6 +75,8 @@ function OrderList() {
             } else {
                 toast.error('Không thể tải danh sách đơn hàng.');
             }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -337,8 +342,15 @@ function OrderList() {
         );
     };
 
+    const countUniqueOrders = (status) => {
+        const filtered = orders.filter((order) => order.status === status);
+        const uniqueCodes = new Set(filtered.map(order => order.order_code));
+        return uniqueCodes.size;
+    };
+
     return (
         <div className="order-list-page">
+            {isLoading && <Loading />}
             <Breadcrumb
                 items={[{ label: 'Tài Khoản', path: '/member/account/update' }, { label: 'Đơn hàng của tôi' }]}
             />
@@ -346,16 +358,16 @@ function OrderList() {
 
             <div className="order-tabs">
                 <button className={activeTab === 'waiting' ? 'active' : ''} onClick={() => setActiveTab('waiting')}>
-                    Chờ xác nhận ({getOrdersByStatus(0).length})
+                    Chờ xác nhận ({countUniqueOrders(0)})
                 </button>
                 <button className={activeTab === 'delivery' ? 'active' : ''} onClick={() => setActiveTab('delivery')}>
-                    Chờ giao hàng ({getOrdersByStatus(1).length})
+                    Chờ giao hàng ({countUniqueOrders(1)})
                 </button>
                 <button className={activeTab === 'delivered' ? 'active' : ''} onClick={() => setActiveTab('delivered')}>
-                    Đã giao hàng ({getOrdersByStatus(2).length})
+                    Đã giao hàng ({countUniqueOrders(2)})
                 </button>
                 <button className={activeTab === 'cancelled' ? 'active' : ''} onClick={() => setActiveTab('cancelled')}>
-                    Đã hủy ({getOrdersByStatus(3).length})
+                    Đã hủy ({countUniqueOrders(3)})
                 </button>
             </div>
 
@@ -363,68 +375,89 @@ function OrderList() {
 
             {selectedOrder && (
                 <div className="modal-overlay" onClick={() => setSelectedOrder(null)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                    <div className="modal-content order-detail-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
-                            <h3>Chi tiết đơn hàng</h3>
+                            <h3><i className="fas fa-file-invoice" style={{ marginRight: '10px' }}></i>Chi tiết đơn hàng</h3>
                             <button className="close-btn" onClick={() => setSelectedOrder(null)}>
                                 ×
                             </button>
                         </div>
                         <div className="modal-body">
-                            <div className="order-detail-section">
-                                <p>
-                                    <strong>Mã đơn hàng:</strong> {selectedOrder.orderCode}
-                                </p>
-                                <p>
-                                    <strong>Trạng thái:</strong> <span className="badge delivered">Đã giao hàng</span>
-                                </p>
-                                <p>
-                                    <strong>Ngày đặt:</strong> {formatDate(selectedOrder.firstOrder.created_at)}
-                                </p>
-                                <p>
-                                    <strong>Phương thức thanh toán:</strong>{' '}
-                                    {selectedOrder.firstOrder.payment_method === 'paypal' ? 'PayPal' : 'Tiền mặt (COD)'}
-                                </p>
-                                {selectedOrder.firstOrder.address && (
-                                    <p>
-                                        <strong>Địa chỉ giao hàng:</strong> {selectedOrder.firstOrder.address}
-                                    </p>
-                                )}
+                            <div className="order-info-grid">
+                                <div className="info-item">
+                                    <label><i className="fas fa-hashtag"></i> Mã đơn hàng</label>
+                                    <span>{selectedOrder.orderCode}</span>
+                                </div>
+                                <div className="info-item">
+                                    <label><i className="fas fa-info-circle"></i> Trạng thái</label>
+                                    <span className="badge delivered">Đã giao hàng</span>
+                                </div>
+                                <div className="info-item">
+                                    <label><i className="fas fa-calendar-alt"></i> Ngày đặt</label>
+                                    <span>{formatDate(selectedOrder.firstOrder.created_at)}</span>
+                                </div>
+                                <div className="info-item">
+                                    <label><i className="fas fa-credit-card"></i> Thanh toán</label>
+                                    <span>{selectedOrder.firstOrder.payment_method === 'paypal' ? 'PayPal' : 'Tiền mặt (COD)'}</span>
+                                </div>
+                                <div className="info-item full-width">
+                                    <label><i className="fas fa-map-marker-alt"></i> Địa chỉ giao hàng</label>
+                                    <span>{selectedOrder.firstOrder.address || 'Chưa cung cấp'}</span>
+                                </div>
                             </div>
 
                             <div className="order-detail-products">
-                                <h4>Sản phẩm:</h4>
-                                {selectedOrder.items.map((item, idx) => {
-                                    const product = item.product;
-                                    if (!product) return null;
-                                    let image = [];
-                                    try {
-                                        image = typeof product.image === 'string' ? JSON.parse(product.image) : product.image;
-                                    } catch {
-                                        image = Array.isArray(product.image) ? product.image : [];
-                                    }
+                                <h4>Sản phẩm đã mua</h4>
+                                <div className="product-scroll-area">
+                                    {selectedOrder.items.map((item, idx) => {
+                                        const product = item.product;
+                                        if (!product) return null;
+                                        let image = [];
+                                        try {
+                                            image = typeof product.image === 'string' ? JSON.parse(product.image) : product.image;
+                                        } catch {
+                                            image = Array.isArray(product.image) ? product.image : [];
+                                        }
 
-                                    return (
-                                        <div key={idx} className="detail-product-item">
-                                            <img
-                                                src={`http://localhost:8000/${image[0] || 'no-image.png'}`}
-                                                alt={product.name}
-                                            />
-                                            <div className="detail-product-info">
-                                                <Link to={`/member/home/product/detail/${product.id}`}>
-                                                    <h4>{product.name}</h4>
-                                                </Link>
-                                                <p>Giá: {formatPrice(item.price)}</p>
-                                                <p>Số lượng: {item.quantity || item.qualty}</p>
-                                                <p>Tổng: {formatPrice(item.price * (item.quantity || item.qualty))}</p>
+                                        return (
+                                            <div key={idx} className="detail-product-item">
+                                                <div className="product-img-wrapper">
+                                                    <img
+                                                        src={`http://localhost:8000/${image[0] || 'no-image.png'}`}
+                                                        alt={product.name}
+                                                    />
+                                                </div>
+                                                <div className="detail-product-info">
+                                                    <Link to={`/member/home/product/detail/${product.id}`} className="product-name-link">
+                                                        {product.name}
+                                                    </Link>
+                                                    <div className="product-meta">
+                                                        <span className="price">{formatPrice(item.price)}</span>
+                                                        <span className="quantity">x{item.quantity || item.qualty}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="product-subtotal">
+                                                    {formatPrice(item.price * (item.quantity || item.qualty))}
+                                                </div>
                                             </div>
-                                        </div>
-                                    );
-                                })}
+                                        );
+                                    })}
+                                </div>
                             </div>
 
-                            <div className="order-detail-total">
-                                <strong>Tổng cộng: {formatPrice(selectedOrder.total)}</strong>
+                            <div className="order-detail-footer">
+                                <div className="summary-row">
+                                    <span>Tạm tính:</span>
+                                    <span>{formatPrice(selectedOrder.total)}</span>
+                                </div>
+                                <div className="summary-row">
+                                    <span>Phí giao hàng:</span>
+                                    <span className="free">Miễn phí</span>
+                                </div>
+                                <div className="summary-row total">
+                                    <span>TỔNG CỘNG:</span>
+                                    <span className="total-price">{formatPrice(selectedOrder.total)}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
