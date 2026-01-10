@@ -237,7 +237,8 @@ function OrderList() {
                         <strong>Tổng cộng: {formatPrice(total)}</strong>
                         <p>
                             Phương thức thanh toán:{' '}
-                            {firstOrder.payment_method === 'paypal' ? 'PayPal' : 'Tiền mặt (COD)'}
+                            {firstOrder.payment_method === 'paypal' ? 'PayPal' :
+                                firstOrder.payment_method === 'stripe' ? 'Stripe' : 'Tiền mặt (COD)'}
                         </p>
                         {firstOrder.address && <p>Địa chỉ: {firstOrder.address}</p>}
                     </div>
@@ -398,7 +399,10 @@ function OrderList() {
                                 </div>
                                 <div className="info-item">
                                     <label><i className="fas fa-credit-card"></i> Thanh toán</label>
-                                    <span>{selectedOrder.firstOrder.payment_method === 'paypal' ? 'PayPal' : 'Tiền mặt (COD)'}</span>
+                                    <span>
+                                        {selectedOrder.firstOrder.payment_method === 'paypal' ? 'PayPal' :
+                                            selectedOrder.firstOrder.payment_method === 'stripe' ? 'Stripe' : 'Tiền mặt (COD)'}
+                                    </span>
                                 </div>
                                 <div className="info-item full-width">
                                     <label><i className="fas fa-map-marker-alt"></i> Địa chỉ giao hàng</label>

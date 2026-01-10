@@ -7,8 +7,13 @@ import MemberCartContext from '../../Context/MemberCartContext';
 import { toast } from 'react-toastify';
 import { useNavigate, Link } from 'react-router-dom';
 import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import StripePaymentForm from './StripePaymentForm';
 import './CheckOut.css';
 import Breadcrumb from '../../component/Member/Breadcrumb';
+
+const stripePromise = loadStripe('pk_test_51So0E52R20SHdJyNoF4ZO4U05Ocy3rvezevFKgW8JK6PFQ2KbvLnysdeABpLBEMRq52FWDRjmEJlQMqGU2YZGZtO00jtEwBAhT');
 
 const VND_TO_USD_RATE = 25000;
 
@@ -392,6 +397,17 @@ function CheckOut() {
                             <div className="radio-option" style={{ marginTop: '10px' }}>
                                 <input
                                     type="radio"
+                                    id="stripe"
+                                    name="payment_method"
+                                    value="stripe"
+                                    checked={paymentMethod === 'stripe'}
+                                    onChange={(e) => setPaymentMethod(e.target.value)}
+                                />
+                                <label htmlFor="stripe">Thanh toán bằng Stripe</label>
+                            </div>
+                            <div className="radio-option" style={{ marginTop: '10px' }}>
+                                <input
+                                    type="radio"
                                     id="paypal"
                                     name="payment_method"
                                     value="paypal"
@@ -476,6 +492,18 @@ function CheckOut() {
                                     >
                                         Đặt Hàng (COD)
                                     </button>
+                                ) : paymentMethod === 'stripe' ? (
+                                    <div style={{ padding: '10px' }}>
+                                        <Elements stripe={stripePromise}>
+                                            <StripePaymentForm
+                                                totalAmount={finalTotalVND}
+                                                onPaymentSuccess={processOrder}
+                                                isLoading={isLoading}
+                                                setIsLoading={setIsLoading}
+                                                formData={formData}
+                                            />
+                                        </Elements>
+                                    </div>
                                 ) : AllQuantityCart > 0 ? (
                                     <div style={{ padding: '10px' }}>
                                         <PayPalButtons

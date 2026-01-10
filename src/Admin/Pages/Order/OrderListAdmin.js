@@ -78,7 +78,6 @@ function OrderListAdmin() {
         return grouped;
     };
 
-    // Filter only waiting orders (status 0)
     const waitingOrders = orders.filter((order) => order.status === 0);
     const groupedOrders = groupOrdersByCode(waitingOrders);
 
@@ -141,7 +140,10 @@ function OrderListAdmin() {
                                             </ul>
                                         </td>
                                         <td>{formatPrice(total)}</td>
-                                        <td>{firstOrder.payment_method === 'paypal' ? 'PayPal' : 'Tiền mặt (COD)'}</td>
+                                        <td>
+                                            {firstOrder.payment_method === 'paypal' ? 'PayPal' :
+                                                firstOrder.payment_method === 'stripe' ? 'Stripe' : 'Tiền mặt (COD)'}
+                                        </td>
                                         <td>
                                             <button
                                                 className="btn btn-primary btn-sm"
