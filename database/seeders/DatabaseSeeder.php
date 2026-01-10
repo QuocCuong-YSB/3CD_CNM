@@ -184,6 +184,78 @@ class DatabaseSeeder extends Seeder
                     'detail' => 'Bộ lọc: 02 tấm lọc nhôm + 02 tấm lọc than hoạt tính khử mùi.',
                     'quantity' => 70,
                     'quantity_sold' => 12
+                ],
+                [
+                    'id_category' => 5,
+                    'id_brand' => 6,
+                    'name' => 'Lò nướng điện thông minh GERTECH GT-688',
+                    'image' => json_encode(['productImages/lo-nuong-dien-thong-minh-gertech-gt-688.jpg']),
+                    'price' => 13000000,
+                    'status' => 1,
+                    'sale' => 8,
+                    'detail' => '4 tính năng: Hẹn giờ, Khóa trẻ em, Báo thức, Đặt trước, Chế độ tiết kiệm năng lượng.',
+                    'quantity' => 58,
+                    'quantity_sold' => 1
+                ],
+                [
+                    'id_category' => 4,
+                    'id_brand' => 6,
+                    'name' => 'Máy ép chậm GERTECH GT-J206 cao cấp giữ nguyên vẹn dưỡng chất',
+                    'image' => json_encode(['productImages/may-ep-cham-gertech-gt-j206-cao-cap-giu-nguyen-ven-duong-chat.png']),
+                    'price' => 3950000,
+                    'status' => 1,
+                    'sale' => 14,
+                    'detail' => 'Sử dụng công nghệ trục vít làm bằng chất liệu nhựa tritan không chứa BPA.',
+                    'quantity' => 50,
+                    'quantity_sold' => 12
+                ],
+                [
+                    'id_category' => 2,
+                    'id_brand' => 8,
+                    'name' => 'Bếp từ All Metal Panasonic KZ-W573S',
+                    'image' => json_encode(['productImages/bep-tu-all-metal-panasonic-kz-w573s.jpg']),
+                    'price' => 28500000,
+                    'status' => 1,
+                    'sale' => 7,
+                    'detail' => 'Công nghệ Econani tiết kiệm điện năng tối đa. Chi phí cho năng lượng cho nấu ăn sẽ giảm đi nhiều so với dùng bếp gas.',
+                    'quantity' => 34,
+                    'quantity_sold' => 10
+                ],
+                [
+                    'id_category' => 3,
+                    'id_brand' => 4,
+                    'name' => 'Bếp từ Kocher DI 6900A',
+                    'image' => json_encode(['productImages/bep-tu-kocher-dl-6900a.jpg']),
+                    'price' => 5900000,
+                    'status' => 1,
+                    'sale' => 16,
+                    'detail' => 'Thương hiệu Việt – Chất lượng Đức – Chất đến từng linh kiện.',
+                    'quantity' => 51,
+                    'quantity_sold' => 12
+                ],
+                [
+                    'id_category' => 1,
+                    'id_brand' => 6,
+                    'name' => 'Bếp Điện Từ Đôi GERTECH GT-5202B',
+                    'image' => json_encode(['productImages/bep-dien-tu-doi-gertech-gt-5202b.png']),
+                    'price' => 21000000,
+                    'status' => 1,
+                    'sale' => 13,
+                    'detail' => 'Chức năng Hâm nóng; Chức năng Tạm dừng; Chức năng Hẹn giờ tối đa 90p.',
+                    'quantity' => 50,
+                    'quantity_sold' => 12
+                ],
+                [
+                    'id_category' => 1,
+                    'id_brand' => 5,
+                    'name' => 'Bếp Điện Bosch PKF645E14E',
+                    'image' => json_encode(['productImages/bep-tu-bosch-pkf645e14e.jpg']),
+                    'price' => 11500000,
+                    'status' => 1,
+                    'sale' => 12,
+                    'detail' => 'Chức năng: Khóa bàn phím và hẹn giờ bật giờ tắt bếp.',
+                    'quantity' => 70,
+                    'quantity_sold' => 12
                 ]
             ];
 

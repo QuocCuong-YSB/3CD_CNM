@@ -13,12 +13,12 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $limit = $request->limit ?? 8;
-
         $products = Product::with(['brand:id,name', 'category:id,name'])
-            ->paginate($limit);
+            ->get();
 
-        return response()->json($products);
+        return response()->json([
+            'data' => $products
+        ]);
     }
 
     public function store(StoreProductRequest $request)
