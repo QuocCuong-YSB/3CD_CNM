@@ -286,7 +286,7 @@ function ProductDetail() {
                     <h2 className="product-title">{input.name}</h2>
 
                     <p className="product-summary">
-                        Thương hiệu: <strong>{input.id_brand?.name || input.company || 'Đang cập nhật'}</strong>
+                        Thương hiệu: <strong>{input.brand?.name || input.company || 'Đang cập nhật'}</strong>
                         <br />
                     </p>
 
