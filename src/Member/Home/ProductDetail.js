@@ -28,6 +28,9 @@ function ProductDetail() {
     const [canReview, setCanReview] = useState(false);
     const [reviewMessage, setReviewMessage] = useState('');
 
+    const [completedOrders, setCompletedOrders] = useState([]);
+    const [selectedOrderCode, setSelectedOrderCode] = useState("");
+
     const [reviews, setReviews] = useState([]);
     const [filteredReviews, setFilteredReviews] = useState([]);
     const [filterType, setFilterType] = useState('all');
@@ -66,7 +69,6 @@ function ProductDetail() {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-
         if (!token) {
             setCanReview(false);
             setReviewMessage('Vui lòng đăng nhập để đánh giá sản phẩm');
@@ -173,6 +175,13 @@ function ProductDetail() {
             return;
         }
 
+        const orderCode = selectedOrderCode;
+
+        if (!orderCode) {
+            toast.warn('Không xác định được đơn hàng để đánh giá');
+            return;
+        }
+
         const config = {
             headers: { Authorization: `Bearer ${token}` },
         };
@@ -180,27 +189,30 @@ function ProductDetail() {
         apiMember.post(`/product/${id}/reviews`, {
             product_id: id,
             rating: currentRating,
-            comment: commentText.toString(),
+            comment: commentText,
+            order_code: selectedOrderCode,
         }, config)
             .then((res) => {
                 toast.success('Đánh giá thành công!');
                 setCommentText('');
                 setCurrentRating(0);
-                setCommentText('');
-                setCurrentRating(0);
                 setShowReviewForm(false);
 
+                // reload reviews
                 apiMember
                     .get(`/product/${id}/reviews`)
                     .then((r) => {
                         const data = r.data.data || [];
                         setReviews(data);
+                        setFilteredReviews(data);
                     });
             })
             .catch((err) => {
                 console.error(err);
                 if (err.response?.status === 403) {
-                    toast.error('Bạn cần mua sản phẩm trước khi đánh giá');
+                    toast.error('Bạn cần mua và nhận hàng trước khi đánh giá');
+                } else if (err.response?.status === 409) {
+                    toast.error('Bạn đã đánh giá đơn hàng này rồi');
                 } else {
                     toast.error(err.response?.data?.error || 'Lỗi khi gửi đánh giá');
                 }
@@ -448,6 +460,22 @@ function ProductDetail() {
                                 <div className="total-rating-count" style={{ color: '#666', marginBottom: '15px' }}>
                                     {totalReviews} lượt đánh giá
                                 </div>
+                                {completedOrders.length > 0 && (
+                                    <div style={{ marginBottom: '15px' }}>
+                                        <label style={{ fontWeight: 'bold' }}>Chọn đơn hàng để đánh giá:</label>
+                                        <select
+                                            value={selectedOrderCode}
+                                            onChange={(e) => setSelectedOrderCode(e.target.value)}
+                                            style={{ marginLeft: '10px', padding: '5px', borderRadius: '4px', border: '1px solid #ddd' }}
+                                        >
+                                            {completedOrders.map((order) => (
+                                                <option key={order.order_code} value={order.order_code}>
+                                                    {order.order_code} - {new Date(order.created_at).toLocaleDateString()}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
                                 <button
                                     className="btn btn-primary"
                                     style={{
@@ -458,7 +486,22 @@ function ProductDetail() {
                                         cursor: canReview ? 'pointer' : 'not-allowed',
                                     }}
                                     disabled={!canReview}
-                                    onClick={() => canReview && setShowReviewForm(!showReviewForm)}
+                                    onClick={() => {
+                                        if (!canReview) return;
+                                        const token = localStorage.getItem('token');
+                                        apiMember
+                                            .get(`/product/${id}/completed-orders`, {
+                                                headers: { Authorization: `Bearer ${token}` },
+                                            })
+                                            .then((res) => {
+                                                setCompletedOrders(res.data.data || []);
+                                                if (res.data.data?.length > 0) {
+                                                    setSelectedOrderCode(res.data.data[0].order_code);
+                                                }
+                                                setShowReviewForm(!showReviewForm);
+                                            })
+                                            .catch(() => toast.error('Không thể lấy đơn hàng để đánh giá'));
+                                    }}
                                 >
                                     Viết đánh giá
                                 </button>
