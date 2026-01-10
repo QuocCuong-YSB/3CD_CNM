@@ -66,8 +66,8 @@ class History extends Model
     public static function getCompletedOrder($userId, $productId)
     {
         return self::where('id_user', $userId)
-            ->where('id_product', $productId)
             ->where('status', self::STATUS_COMPLETED)
+            ->whereJsonContains('products', $productId) 
             ->latest()
             ->first();
     }
