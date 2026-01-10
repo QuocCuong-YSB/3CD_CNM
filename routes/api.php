@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Member\MemberController as MemberMemberController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Member\StripeController;
 use App\Http\Controllers\ChatController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
@@ -71,6 +72,7 @@ Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:1'])->prefix
 Route::middleware(['auth:sanctum', 'check.token.expiration', 'level:0'])->prefix('member')->group(function () {
     // Checkout
     Route::post('/order', [CheckoutController::class, 'placeOrder']);
+    Route::post('/payment/stripe/create-intent', [StripeController::class, 'createPaymentIntent']);
 
     // Member Orders
     Route::get('/order/user/{id}', [OrderController::class, 'index']);
