@@ -7,6 +7,7 @@ import './Login.css';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { setCartDetails } from '../../features/cart/Cart';
+import Loading from '../../component/Loading';
 
 
 function LoginMember() {
@@ -18,6 +19,7 @@ function LoginMember() {
         password: '',
         level: '0',
     });
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         localStorage.removeItem('token');
@@ -52,6 +54,7 @@ function LoginMember() {
         if (!check) {
             SetErr(errAll);
         } else {
+            setIsLoading(true);
             const data = {
                 email: input.email,
                 password: input.password,
@@ -79,12 +82,15 @@ function LoginMember() {
                         })
                         .catch(() => {
                             dispatch(setCartDetails({}));
+                        })
+                        .finally(() => {
+                            setIsLoading(false);
+                            toast.success('Đăng nhập thành công');
+                            navigate('/member/home');
                         });
-
-                    toast.success('Đăng nhập thành công');
-                    navigate('/member/home');
                 })
                 .catch((error) => {
+                    setIsLoading(false);
                     if (error.response && error.response.data) {
                         const errors = error.response.data.errors;
 
@@ -93,6 +99,8 @@ function LoginMember() {
                         } else {
                             toast.error(error.response.data.message);
                         }
+                    } else {
+                        toast.error("Đăng nhập thất bại");
                     }
                 });
         }
@@ -103,6 +111,7 @@ function LoginMember() {
     }
 
     const handleSuccess = async (credentialResponse) => {
+        setIsLoading(true);
         try {
             const idToken = credentialResponse.credential;
             const res = await auth.post('/login/google', { token: idToken });
@@ -125,10 +134,13 @@ function LoginMember() {
         } catch (error) {
             console.error('Google Login Error:', error);
             toast.error('Đăng nhập bằng Google thất bại');
+        } finally {
+            setIsLoading(false);
         }
     };
     return (
         <div className="login">
+            {isLoading && <Loading />}
             <h2>ĐĂNG NHẬP</h2>
             <form>
                 <label htmlFor="email">Email</label>
